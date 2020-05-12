@@ -13,7 +13,8 @@
     "react-firebase-hooks": "^2.1.1",
     "react-scripts": "3.3.0",
     "react-with-firebase-auth": "^1.2.0",
-    "tools": "0.0.0"
+    "tools": "0.0.0",
+    "uuid": "^8.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
