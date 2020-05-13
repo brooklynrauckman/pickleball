@@ -4,6 +4,8 @@ import * as firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
 import Tourneys from "./Tourneys.js";
+import { useHistory } from "react-router-dom";
+
 import { MuiPickersUtilsProvider, DateTimePicker } from "@material-ui/pickers";
 import {
   Button,
@@ -73,6 +75,8 @@ const EditTourney = (props) => {
 
   const classes = useStyles();
 
+  let history = useHistory();
+
   async function editTourney(
     id,
     title,
@@ -101,12 +105,11 @@ const EditTourney = (props) => {
           tempList[t].contact = contact;
           tempList[t].organizer = organizer;
           tempList[t].details = details;
-
-          console.log(tempList);
           querySnapshot.docs[0].ref.update({
             tournaments: tempList,
           });
           window.alert("Tournament update successful!");
+          history.push("/tourneys");
           setIsOpen(null);
         }
       }
@@ -120,7 +123,7 @@ const EditTourney = (props) => {
     <div className="create-form">
       {tournaments.length
         ? tournaments.map((tournament, index) => (
-            <React.Fragment>
+            <React.Fragment key={index}>
               {isOpen == index ? (
                 <React.Fragment>
                   <FormControl className="create-tournament">

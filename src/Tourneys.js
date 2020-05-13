@@ -47,7 +47,7 @@ const Tourneys = (props) => {
     async function getTourneys() {
       // we assume there is only 1 result so hardcode the [0]
       const fetchedTourneys = await value.docs[0].get("tournaments");
-      // CHANGE FETCHED BADGES
+
       const newFetchedTourneys = fetchedTourneys.map((tournament) => {
         let formatDate = new Date(tournament.date);
         let dayDate = formatDate.getDate();
@@ -126,16 +126,7 @@ const Tourneys = (props) => {
                     <circle cx="12" cy="5" r="1" />
                     <circle cx="12" cy="19" r="1" />
                   </svg>
-                  <div
-                    className="option"
-                    onClick={() => {
-                      setIsOpen(null);
-                      deleteTourneys(tournament);
-                    }}
-                  >
-                    Delete
-                  </div>
-                  <Link to="/edit">
+                  <Link to="/edit" className="link-edit">
                     <div
                       className="option"
                       onClick={() => {
@@ -145,6 +136,15 @@ const Tourneys = (props) => {
                       Edit
                     </div>
                   </Link>
+                  <div
+                    className="option"
+                    onClick={() => {
+                      setIsOpen(null);
+                      deleteTourneys(tournament);
+                    }}
+                  >
+                    Delete
+                  </div>
                 </div>
               ) : (
                 <React.Fragment>

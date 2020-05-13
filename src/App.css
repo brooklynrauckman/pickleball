@@ -111,31 +111,6 @@
   cursor: pointer;
 }
 
-/* .create-tournament {
-  margin: 1rem;
-  padding: 1rem 2rem;
-  width: 100%;
-  outline: none;
-  font-family: inherit;
-  font-size: 1rem;
-  text-align: center;
-  border-top: none;
-  border-right: none;
-  border-left: none;
-  border-bottom: solid 1px gray;
-} */
-/*
-.create-tournament:hover {
-  border-bottom: solid 1px black;
-  transition: 0.2s ease-in-out;
-}
-
-.create-tournament:focus {
-  border-bottom: solid 2px #3f50b5;
-  padding-bottom: 15px;
-  transition: 0.2s ease-in-out;
-} */
-
 .date-time-picker,
 .create-tournament {
   width: 100%;
@@ -215,6 +190,11 @@
   transition: 0.3s ease-in-out;
 }
 
+.link-edit {
+  color: inherit;
+  text-decoration: none;
+}
+
 .option:hover {
   font-weight: bold;
   cursor: pointer;
@@ -238,14 +218,14 @@
 }
 
 .details-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: bold;
   align-self: center;
-  padding-bottom: 2rem;
+  padding: 2rem 0;
 }
 
 .detail {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   padding-bottom: 1rem;
 }
 
