@@ -13,6 +13,21 @@
   padding: 2rem 0;
 }
 
+.login-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-nav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .title {
   font-size: 3.25rem;
   font-weight: bold;
@@ -27,98 +42,156 @@
 }
 
 .sign-in {
-  background-color: #048BA8;
+  background-color: #048ba8;
   color: inherit;
   font-weight: bold;
   margin: 1rem;
   padding: 1rem 2rem;
   width: auto;
-  border-radius: 20px;
+  border-radius: 30px;
   font-family: inherit;
   font-size: 1rem;
   outline: none;
   border: none;
   transform: scale(1);
-  transition: 0.3s;
+  transition: 0.3s ease-in-out;
 }
 
-.sign-in:hover {
-  transform: scale(1.1);
+.sign-in:hover,
+.sign-out:hover {
+  transform: scale(1.05);
   cursor: pointer;
 }
 
-.create-badge {
+.sign-out {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #048ba8;
+  color: inherit;
+  font-weight: bold;
   margin: 1rem;
   padding: 1rem 2rem;
-  width: 80%;
+  width: auto;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  border: none;
+  transform: scale(1);
+  transition: 0.3s ease-in-out;
+}
+
+.remove-decoration {
+  text-decoration: none;
+  color: inherit;
+}
+
+.link {
+  background-color: #048ba8;
+  color: inherit;
+  font-weight: bold;
+  margin: 1rem;
+  padding: 1rem 2rem;
+  width: auto;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  border: none;
+  transform: scale(1);
+  transition: 0.3s ease-in-out;
+}
+
+.link:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+/* .create-tournament {
+  margin: 1rem;
+  padding: 1rem 2rem;
+  width: 100%;
   outline: none;
   font-family: inherit;
   font-size: 1rem;
-  border-radius: 20px;
-  border: none;
+  text-align: center;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  border-bottom: solid 1px gray;
+} */
+/*
+.create-tournament:hover {
+  border-bottom: solid 1px black;
+  transition: 0.2s ease-in-out;
 }
 
-.badge {
+.create-tournament:focus {
+  border-bottom: solid 2px #3f50b5;
+  padding-bottom: 15px;
+  transition: 0.2s ease-in-out;
+} */
+
+.date-time-picker,
+.create-tournament {
+  width: 100%;
+  font-size: 1rem;
+}
+
+.tournament {
+  width: 100%;
+  height: 50px;
   text-align: center;
-  padding: 1rem 2rem;
+  padding: 1rem 3rem;
   background: white;
-  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 20px;
+  border-radius: 30px;
   position: relative;
-  color: #2F2D2E;
+  color: #2f2d2e;
 }
 
 .completed {
-  background: #99C24D;
-  color: #2F2D2E;
+  background: #99c24d;
+  color: #2f2d2e;
 }
 
-
-.badges-wrapper {
+.tournaments {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 80%;
-  margin: 1rem;
-}
-
-.badges {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  grid-template-rows: repeat(1, 1fr);
   width: 100%;
-  grid-gap: 2rem;
   font-size: 1.5rem;
 }
 
 .options {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   margin: 1rem;
   transform: scale(1);
-  transition: 0.3s;
+  transition: 0.3s ease-in-out;
   z-index: 2;
 }
 
 .options:hover {
   cursor: pointer;
-  transform: scale(1.5);
+  transform: scale(1.2);
 }
 
 .options-list {
   position: absolute;
   top: 0;
   right: 0;
-  height: 200px;
+  height: 100%;
   width: 100%;
-  padding: 2rem;
+  padding: 1rem 3rem;
   border: 2px solid white;
-  border-radius: 20px;
-  background-color: #2E4057;
+  border-radius: 30px;
+  background-color: #2e4057;
   color: white;
   font-size: 1rem;
   text-align: center;
@@ -131,13 +204,13 @@
   text-align: center;
   padding: 1rem;
   transform: scale(1);
-  transition: 0.3s;
+  transition: 0.3s ease-in-out;
 }
 
 .option:hover {
   font-weight: bold;
   cursor: pointer;
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .check {
@@ -147,16 +220,42 @@
   margin: 1rem;
 }
 
-/* media queries  */
-
-@media (min-width: 550px) {
-  .badges {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.tournament-details {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
 }
 
-@media (min-width: 900px) {
-  .badges {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.create-button {
+  width: 100%;
+  margin: 1rem;
+  padding: 1rem 2rem;
+  outline: none;
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 30px;
+  border: none;
+  background-color: #048ba8;
+  color: inherit;
+  font-weight: bold;
+  transform: scale(1);
+  transition: 0.3s ease-in-out;
+}
+
+.create-button:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 2rem 2rem 2rem;
+  width: 100%;
+  max-width: 500px;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 30px;
 }
