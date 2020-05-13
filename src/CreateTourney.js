@@ -92,8 +92,8 @@ const CreateTourney = (props) => {
       const tempList = querySnapshot.docs[0].get("tournaments");
       tempList.push({
         title: title,
-        deadline: deadline.format("MMMM d, YYYY"),
-        date: date.format("MMMM d, YYYY"),
+        deadline: deadline.toISOString(),
+        date: date.toISOString(),
         venue: venue,
         courts: courts,
         gender: gender,
@@ -132,8 +132,8 @@ const CreateTourney = (props) => {
       <FormControl className="create-tournament">
         <MuiPickersUtilsProvider utils={MomentUtils}>
           <DateTimePicker
-            onChange={setDate}
             value={date}
+            onChange={setDate}
             inputVariant="outlined"
             label="Date & Time"
             margin="normal"
@@ -164,7 +164,6 @@ const CreateTourney = (props) => {
           min={1}
           max={8}
           valueLabelDisplay="auto"
-          value={courts}
           onChange={(event, value) => setCourts(value)}
           required
         />
@@ -178,7 +177,6 @@ const CreateTourney = (props) => {
           className={`create-tournament ${classes.selectEmpty}`}
           labelId="demo-simple-select-outlined-label"
           id="demo-simple-select-outlined"
-          value={gender}
           onChange={(e) => setGender(e.target.value)}
           label="Gender"
           variant="outlined"
@@ -197,7 +195,6 @@ const CreateTourney = (props) => {
         </InputLabel>
         <OutlinedInput
           id="outlined-adornment-amount"
-          value={fee}
           onChange={(e) => setFee(e.target.value)}
           startAdornment={<InputAdornment position="start">$</InputAdornment>}
           labelWidth={120}

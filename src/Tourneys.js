@@ -49,14 +49,48 @@ const Tourneys = (props) => {
       const fetchedTourneys = await value.docs[0].get("tournaments");
       // CHANGE FETCHED BADGES
       const newFetchedTourneys = fetchedTourneys.map((tournament) => {
+        let formatDate = new Date(tournament.date);
+        let dayDate = formatDate.getDate();
+        let monthDate = formatDate.getMonth() + 1;
+        let yearDate = formatDate.getFullYear();
+        let hoursDate = formatDate.getHours();
+        let minsDate = formatDate.getMinutes();
+        let amOrPmDate;
+        if (hoursDate > 12) {
+          hoursDate = hoursDate - 12;
+          amOrPmDate = "PM";
+        } else if (hoursDate < 12) {
+          amOrPmDate = "AM";
+        } else if ((hoursDate = 12)) {
+          amOrPmDate = "PM";
+        }
+        let dateString = `${monthDate}-${dayDate}-${yearDate} ${hoursDate}:${minsDate} ${amOrPmDate}`;
+
+        let formatDeadline = new Date(tournament.deadline);
+        let dayDeadline = formatDeadline.getDate();
+        let monthDeadline = formatDeadline.getMonth() + 1;
+        let yearDeadline = formatDeadline.getFullYear();
+        let hoursDeadline = formatDeadline.getHours();
+        let minsDeadline = formatDeadline.getMinutes();
+        let amOrPmDeadline;
+        if (hoursDeadline > 12) {
+          hoursDeadline = hoursDeadline - 12;
+          amOrPmDeadline = "PM";
+        } else if (hoursDeadline < 12) {
+          amOrPmDeadline = "AM";
+        } else if ((hoursDeadline = 12)) {
+          amOrPmDeadline = "PM";
+        }
+        let deadlineString = `${monthDeadline}-${dayDeadline}-${yearDeadline} ${hoursDeadline}:${minsDeadline} ${amOrPmDeadline}`;
+
         return {
           title: tournament.title,
-          date: tournament.date,
+          date: dateString,
           venue: tournament.venue,
           courts: tournament.courts,
           gender: tournament.gender,
           fee: tournament.fee,
-          deadline: tournament.deadline,
+          deadline: deadlineString,
           organizer: tournament.organizer,
           contact: tournament.contact,
           details: tournament.details,

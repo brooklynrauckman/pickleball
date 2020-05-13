@@ -76,8 +76,6 @@ const EditTourney = (props) => {
   async function editTourney(
     id,
     title,
-    deadline,
-    date,
     venue,
     courts,
     gender,
@@ -97,8 +95,6 @@ const EditTourney = (props) => {
         if (isOpen.toString() === t) {
           tempList[t].title = title;
           tempList[t].venue = venue;
-          tempList[t].deadline = deadline.format("MMMM d, YYYY");
-          tempList[t].date = date.format("MMMM d, YYYY");
           tempList[t].courts = courts;
           tempList[t].genfer = gender;
           tempList[t].fee = fee;
@@ -136,18 +132,6 @@ const EditTourney = (props) => {
                       required
                       defaultValue={tournament.title}
                     ></TextField>
-                  </FormControl>
-                  <FormControl className="create-tournament">
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                      <DateTimePicker
-                        onChange={setDate}
-                        defaultValue={tournament.date}
-                        inputVariant="outlined"
-                        label="Date & Time"
-                        margin="normal"
-                        required
-                      />
-                    </MuiPickersUtilsProvider>
                   </FormControl>
                   <FormControl className="create-tournament">
                     <TextField
@@ -228,18 +212,6 @@ const EditTourney = (props) => {
                     />
                   </FormControl>
                   <FormControl className="create-tournament">
-                    <MuiPickersUtilsProvider utils={MomentUtils}>
-                      <DateTimePicker
-                        defaultValue={tournament.deadline}
-                        onChange={setDeadline}
-                        inputVariant="outlined"
-                        label="Registration Deadline"
-                        margin="normal"
-                        required
-                      />
-                    </MuiPickersUtilsProvider>
-                  </FormControl>
-                  <FormControl className="create-tournament">
                     <TextField
                       defaultValue={tournament.organizer}
                       label="Orgainizer Name"
@@ -280,8 +252,6 @@ const EditTourney = (props) => {
                       editTourney(
                         id,
                         title,
-                        deadline,
-                        date,
                         venue,
                         courts,
                         gender,
