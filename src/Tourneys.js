@@ -8,9 +8,14 @@ const Tourneys = (props) => {
     user,
     title,
     date,
-    location,
+    venue,
     courts,
+    gender,
+    fee,
     deadline,
+    contact,
+    organizer,
+    details,
     isOpen,
     setIsOpen,
   } = props;
@@ -28,6 +33,7 @@ const Tourneys = (props) => {
     const querySnapshot = await value.docs[0].get("tournaments");
     const updatedArray = querySnapshot.filter((t) => {
       if (t.title !== tournament.title) {
+        console.log(t);
         return t;
       }
     });
@@ -44,10 +50,15 @@ const Tourneys = (props) => {
       const newFetchedTourneys = fetchedTourneys.map((tournament) => {
         return {
           title: tournament.title,
-          deadline: tournament.deadline,
           date: tournament.date,
-          location: tournament.location,
+          venue: tournament.venue,
           courts: tournament.courts,
+          gender: tournament.gender,
+          fee: tournament.fee,
+          deadline: tournament.deadline,
+          organizer: tournament.organizer,
+          contact: tournament.contact,
+          details: tournament.details,
         };
       });
       updateTournaments(newFetchedTourneys);
@@ -67,8 +78,8 @@ const Tourneys = (props) => {
                     className="options"
                     onClick={() => setIsOpen(null)}
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="25"
+                    height="25"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="white"
@@ -87,7 +98,7 @@ const Tourneys = (props) => {
                       deleteTourneys(tournament);
                     }}
                   >
-                    Remove
+                    Delete
                   </div>
                 </div>
               ) : (
@@ -97,8 +108,8 @@ const Tourneys = (props) => {
                     id={tournament.id}
                     onClick={() => setIsOpen(index)}
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="25"
+                    height="25"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -110,10 +121,36 @@ const Tourneys = (props) => {
                     <circle cx="12" cy="5" r="1" />
                     <circle cx="12" cy="19" r="1" />
                   </svg>
+                  <div className="details-title">{tournament.title}</div>
                   <div className="tournament-details">
-                    <div>{tournament.title}</div>
-                    <div>{tournament.date}</div>
-                    <div>{tournament.location}</div>
+                    <div className="detail">
+                      <strong>Date & Time:</strong> {tournament.date}
+                    </div>
+                    <div className="detail">
+                      <strong>Venue:</strong> {tournament.venue}
+                    </div>
+                    <div className="detail">
+                      <strong>Number of Courts:</strong> {tournament.courts}
+                    </div>
+                    <div className="detail">
+                      <strong>Gender:</strong> {tournament.gender}
+                    </div>
+                    <div className="detail">
+                      <strong>Registration Fee:</strong> {tournament.fee}
+                    </div>
+                    <div className="detail">
+                      <strong>Registration Deadline:</strong>{" "}
+                      {tournament.deadline}
+                    </div>
+                    <div className="detail">
+                      <strong>Organizer:</strong> {tournament.organizer}
+                    </div>
+                    <div className="detail">
+                      <strong>Organizer Contact:</strong> {tournament.contact}
+                    </div>
+                  </div>
+                  <div className="detail">
+                    <strong>Details:</strong> {tournament.details}
                   </div>
                 </React.Fragment>
               )}

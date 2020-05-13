@@ -6,6 +6,8 @@ import "firebase/auth";
 import Tourneys from "./Tourneys.js";
 import CreateTourney from "./CreateTourney.js";
 import Login from "./Login.js";
+import Nav from "./Nav.js";
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -46,9 +48,12 @@ const App = () => {
   const [details, setDetails] = useState(null);
   const [isOpen, setIsOpen] = useState(null);
 
+  const [navToggle, updateNavToggle] = useState(false);
+
   return (
     <Router>
       <div className="App">
+        <Nav navToggle={navToggle} updateNavToggle={updateNavToggle} />
         <Switch>
           <Route exact path="/tourneys">
             {user ? (
@@ -104,7 +109,14 @@ const App = () => {
             )}
           </Route>
           <Route exact path="/">
-            <Login db={db} provider={provider} user={user} setUser={setUser} />
+            <Login
+              db={db}
+              provider={provider}
+              user={user}
+              setUser={setUser}
+              navToggle={navToggle}
+              updateNavToggle={updateNavToggle}
+            />
           </Route>
         </Switch>
       </div>

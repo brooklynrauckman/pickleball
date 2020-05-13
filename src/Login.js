@@ -41,8 +41,9 @@ const Login = (props) => {
       <div className="title">Pickleball Tourneys</div>
       {user ? (
         <React.Fragment>
+          <div className="greeting">Hello, {user.displayName}</div>
           <button
-            className="sign-out"
+            className="sign-in"
             onClick={async () => {
               await firebase.auth().signOut();
               setUser(null);
@@ -50,15 +51,6 @@ const Login = (props) => {
           >
             Sign Out
           </button>
-          <div className="greeting">Hello, {user.displayName}</div>
-          <div className="login-nav">
-            <Link to="/tourneys" className="remove-decoration">
-              <div className="link">View Tournaments</div>
-            </Link>
-            <Link to="/create" className="remove-decoration">
-              <div className="link">Create New Tournament</div>
-            </Link>
-          </div>
         </React.Fragment>
       ) : (
         <button
