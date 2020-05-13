@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
+import { v4 as uuidv4 } from "uuid";
+
 import Tourneys from "./Tourneys.js";
 import CreateTourney from "./CreateTourney.js";
+import EditTourney from "./EditTourney.js";
 import Login from "./Login.js";
 import Nav from "./Nav.js";
 
@@ -12,7 +15,6 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   Redirect,
 } from "react-router-dom";
 
@@ -34,6 +36,9 @@ const db = firebase.firestore();
 // PROVIDER
 const provider = new firebase.auth.GoogleAuthProvider();
 
+// Generate a new UUID
+const id = uuidv4();
+
 const App = () => {
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState(null);
@@ -47,6 +52,7 @@ const App = () => {
   const [organizer, setOrganizer] = useState(null);
   const [details, setDetails] = useState(null);
   const [isOpen, setIsOpen] = useState(null);
+  const [tournaments, updateTournaments] = useState([]);
 
   const [navToggle, updateNavToggle] = useState(false);
 
@@ -59,6 +65,7 @@ const App = () => {
             {user ? (
               <Tourneys
                 user={user}
+                id={id}
                 title={title}
                 date={date}
                 venue={venue}
@@ -71,6 +78,8 @@ const App = () => {
                 details={details}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
+                tournaments={tournaments}
+                updateTournaments={updateTournaments}
               />
             ) : (
               <Redirect to="/" />
@@ -79,6 +88,39 @@ const App = () => {
           <Route exact path="/create">
             {user ? (
               <CreateTourney
+                user={user}
+                id={id}
+                setTitle={setTitle}
+                setDate={setDate}
+                setVenue={setVenue}
+                setDeadline={setDeadline}
+                setCourts={setCourts}
+                title={title}
+                date={date}
+                venue={venue}
+                deadline={deadline}
+                courts={courts}
+                gender={gender}
+                setGender={setGender}
+                fee={fee}
+                setFee={setFee}
+                contact={contact}
+                setContact={setContact}
+                organizer={organizer}
+                setOrganizer={setOrganizer}
+                details={details}
+                setDetails={setDetails}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                db={db}
+              />
+            ) : (
+              <Redirect to="/" />
+            )}
+          </Route>
+          <Route exact path="/edit">
+            {user ? (
+              <EditTourney
                 user={user}
                 setTitle={setTitle}
                 setDate={setDate}
@@ -103,6 +145,7 @@ const App = () => {
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 db={db}
+                tournaments={tournaments}
               />
             ) : (
               <Redirect to="/" />

@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 const Login = (props) => {
   const { db, provider, user, setUser } = props;

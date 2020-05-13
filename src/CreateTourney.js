@@ -4,7 +4,6 @@ import * as firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
 import Tourneys from "./Tourneys.js";
-import { v4 as uuidv4 } from "uuid";
 import { MuiPickersUtilsProvider, DateTimePicker } from "@material-ui/pickers";
 import {
   Button,
@@ -44,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 const CreateTourney = (props) => {
   const {
     user,
+    id,
     setTitle,
     setDate,
     setVenue,
@@ -69,9 +69,6 @@ const CreateTourney = (props) => {
     setIsOpen,
     db,
   } = props;
-
-  // Generate a new UUID
-  const id = uuidv4();
 
   const classes = useStyles();
 

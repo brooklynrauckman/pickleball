@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
+import { Link } from "react-router-dom";
 
 const Tourneys = (props) => {
   const {
@@ -18,6 +19,8 @@ const Tourneys = (props) => {
     details,
     isOpen,
     setIsOpen,
+    tournaments,
+    updateTournaments,
   } = props;
 
   const [value] = useCollection(
@@ -26,8 +29,6 @@ const Tourneys = (props) => {
       .collection("users")
       .where("userId", "==", user ? user.uid : "")
   );
-
-  const [tournaments, updateTournaments] = useState([]);
 
   async function deleteTourneys(tournament) {
     const querySnapshot = await value.docs[0].get("tournaments");
@@ -100,6 +101,16 @@ const Tourneys = (props) => {
                   >
                     Delete
                   </div>
+                  <Link to="/edit">
+                    <div
+                      className="option"
+                      onClick={() => {
+                        setIsOpen(index);
+                      }}
+                    >
+                      Edit
+                    </div>
+                  </Link>
                 </div>
               ) : (
                 <React.Fragment>
