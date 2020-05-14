@@ -133,6 +133,10 @@
   color: #2f2d2e;
 }
 
+.tournaments {
+  width: 100%;
+}
+
 .completed {
   background: #99c24d;
   color: #2f2d2e;

@@ -3,25 +3,9 @@ import * as firebase from "firebase/app";
 import "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { Link } from "react-router-dom";
-
 const Tourneys = (props) => {
-  const {
-    user,
-    title,
-    date,
-    venue,
-    courts,
-    gender,
-    fee,
-    deadline,
-    contact,
-    organizer,
-    details,
-    isOpen,
-    setIsOpen,
-    tournaments,
-    updateTournaments,
-  } = props;
+  const { user, isOpen, setIsOpen } = props;
+  const [tournaments, updateTournaments] = useState([]);
 
   const [value] = useCollection(
     firebase
@@ -33,7 +17,7 @@ const Tourneys = (props) => {
   async function deleteTourneys(tournament) {
     const querySnapshot = await value.docs[0].get("tournaments");
     const updatedArray = querySnapshot.filter((t) => {
-      if (t.title !== tournament.title) {
+      if (t.id !== tournament.id) {
         console.log(t);
         return t;
       }
@@ -101,13 +85,18 @@ const Tourneys = (props) => {
     if (value && value.docs[0] && user) {
       getTourneys();
     }
-  }, [value]);
+  }, [value, user]);
+
+  useEffect(() => {
+    console.log(isOpen);
+  }, [isOpen]);
+
   return (
     <div className="tournaments">
       {tournaments.length
-        ? tournaments.map((tournament, index) => (
-            <div key={index} className="tournament">
-              {isOpen === index ? (
+        ? tournaments.map((tournament) => (
+            <div key={tournament.id} className="tournament">
+              {isOpen === tournament.id ? (
                 <div className="options-list">
                   <svg
                     className="options"
@@ -130,7 +119,7 @@ const Tourneys = (props) => {
                     <div
                       className="option"
                       onClick={() => {
-                        setIsOpen(index);
+                        setIsOpen(tournament.id);
                       }}
                     >
                       Edit
@@ -151,7 +140,10 @@ const Tourneys = (props) => {
                   <svg
                     className="options"
                     id={tournament.id}
-                    onClick={() => setIsOpen(index)}
+                    onClick={() => {
+                      setIsOpen(tournament.id);
+                      console.log(tournament.id);
+                    }}
                     xmlns="http://www.w3.org/2000/svg"
                     width="25"
                     height="25"

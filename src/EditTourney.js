@@ -4,8 +4,9 @@ import * as firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
 import Tourneys from "./Tourneys.js";
-import { useHistory } from "react-router-dom";
-
+import { useHistory, useLocation } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { updateTournament, updateTournaments } from "./redux/actions/actions";
 import { MuiPickersUtilsProvider, DateTimePicker } from "@material-ui/pickers";
 import {
   Button,
@@ -43,42 +44,31 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditTourney = (props) => {
-  const {
-    user,
-    id,
-    setTitle,
-    setDate,
-    setVenue,
-    setTime,
-    setCourts,
-    setDeadline,
-    title,
-    date,
-    venue,
-    deadline,
-    courts,
-    gender,
-    setGender,
-    fee,
-    setFee,
-    contact,
-    setContact,
-    organizer,
-    setOrganizer,
-    details,
-    setDetails,
-    isOpen,
-    setIsOpen,
-    db,
-    tournaments,
-  } = props;
+  const { user, id, isCreate, isOpen, setIsOpen, db } = props;
 
   const classes = useStyles();
 
   let history = useHistory();
+  let location = useLocation();
+
+  const dispatch = useDispatch();
+
+  const { tournament, tournaments } = useSelector((state) => ({
+    tournament: state.pickleball.tournament,
+    tournaments: state.pickleball.tournaments,
+    test: state,
+  }));
+
+  let title = tournament.title;
+  let venue = tournament.venue;
+  let courts = tournament.courts;
+  let gender = tournament.gender;
+  let fee = tournament.fee;
+  let contact = tournament.contact;
+  let organizer = tournament.organizer;
+  let details = tournament.details;
 
   async function editTourney(
-    id,
     title,
     venue,
     courts,
@@ -94,9 +84,9 @@ const EditTourney = (props) => {
         .where("userId", "==", user.uid)
         .get();
       const tempList = querySnapshot.docs[0].get("tournaments");
-
+      console.log(isOpen);
       for (let t in tempList) {
-        if (isOpen.toString() === t) {
+        if (isOpen === tempList[t].id) {
           tempList[t].title = title;
           tempList[t].venue = venue;
           tempList[t].courts = courts;
@@ -110,7 +100,6 @@ const EditTourney = (props) => {
           });
           window.alert("Tournament update successful!");
           history.push("/tourneys");
-          setIsOpen(null);
         }
       }
     } catch (error) {
@@ -119,161 +108,213 @@ const EditTourney = (props) => {
     }
   }
 
+  async function createTourney(
+    title,
+    venue,
+    courts,
+    gender,
+    fee,
+    contact,
+    organizer,
+    details
+  ) {
+    try {
+      const querySnapshot = await db
+        .collection("users")
+        .where("userId", "==", user.uid)
+        .get();
+      const tempList = querySnapshot.docs[0].get("tournaments");
+      tempList.push({
+        title: title,
+        venue: venue,
+        courts: courts,
+        gender: gender,
+        fee: fee,
+        contact: contact,
+        organizer: organizer,
+        details: details,
+        admin: user.uid,
+        id: id,
+      });
+      if (!title || !venue || !courts) {
+        window.alert("Please, fill out all of the required fields.");
+      } else {
+        querySnapshot.docs[0].ref.update({
+          tournaments: tempList,
+        });
+        window.alert("Tournament creation successful!");
+      }
+    } catch (error) {
+      window.alert("Error creating tournament.");
+      console.log("Error creating tournament", error);
+    }
+  }
   return (
     <div className="create-form">
-      {tournaments.length
-        ? tournaments.map((tournament, index) => (
-            <React.Fragment key={index}>
-              {isOpen == index ? (
-                <React.Fragment>
-                  <FormControl className="create-tournament">
-                    <TextField
-                      label="Tournament Title"
-                      variant="outlined"
-                      onChange={(e) => setTitle(e.target.value)}
-                      margin="normal"
-                      required
-                      defaultValue={tournament.title}
-                    ></TextField>
-                  </FormControl>
-                  <FormControl className="create-tournament">
-                    <TextField
-                      defaultValue={tournament.venue}
-                      label="Tournament Venue"
-                      variant="outlined"
-                      onChange={(e) => {
-                        setVenue(e.target.value);
-                      }}
-                      margin="normal"
-                      required
-                    ></TextField>
-                  </FormControl>
-                  <FormControl
-                    className={`create-tournament ${classes.slider}`}
-                  >
-                    <Typography
-                      id="discrete-slider"
-                      gutterBottom
-                      color="textPrimary"
-                    >
-                      Number of Courts
-                    </Typography>
-                    <Slider
-                      defaultValue={tournament.courts}
-                      aria-labelledby="discrete-slider-restrict"
-                      step={1}
-                      marks
-                      min={1}
-                      max={8}
-                      valueLabelDisplay="auto"
-                      value={courts}
-                      onChange={(event, value) => setCourts(value)}
-                      required
-                    />
-                  </FormControl>
-                  <FormControl
-                    variant="outlined"
-                    className={`create-tournament ${classes.formControl}`}
-                  >
-                    <InputLabel id="demo-simple-select-outlined-label">
-                      Gender
-                    </InputLabel>
-                    <Select
-                      className={`create-tournament ${classes.selectEmpty}`}
-                      labelId="demo-simple-select-outlined-label"
-                      id="demo-simple-select-outlined"
-                      value={gender}
-                      onChange={(e) => setGender(e.target.value)}
-                      label="Gender"
-                      variant="outlined"
-                      defaultValue={tournament.gender}
-                    >
-                      <MenuItem value={""}>
-                        <em>None</em>
-                      </MenuItem>
-                      <MenuItem value={"Mens"}>Mens</MenuItem>
-                      <MenuItem value={"Womens"}>Womens</MenuItem>
-                      <MenuItem value={"Mixed"}>Mixed</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl
-                    fullWidth
-                    className={classes.margin}
-                    variant="outlined"
-                  >
-                    <InputLabel htmlFor="outlined-adornment-amount">
-                      Registration Fee
-                    </InputLabel>
-                    <OutlinedInput
-                      id="outlined-adornment-amount"
-                      defaultValue={tournament.fee}
-                      onChange={(e) => setFee(e.target.value)}
-                      startAdornment={
-                        <InputAdornment position="start">$</InputAdornment>
-                      }
-                      labelWidth={120}
-                    />
-                  </FormControl>
-                  <FormControl className="create-tournament">
-                    <TextField
-                      defaultValue={tournament.organizer}
-                      label="Orgainizer Name"
-                      variant="outlined"
-                      onChange={(e) => {
-                        setOrganizer(e.target.value);
-                      }}
-                      margin="normal"
-                    ></TextField>
-                  </FormControl>
-                  <FormControl className="create-tournament">
-                    <TextField
-                      defaultValue={tournament.contact}
-                      label="Contact Phone/Email"
-                      variant="outlined"
-                      onChange={(e) => {
-                        setContact(e.target.value);
-                      }}
-                      margin="normal"
-                    ></TextField>
-                  </FormControl>
-                  <FormControl
-                    className={`create-tournament ${classes.details}`}
-                  >
-                    <TextField
-                      defaultValue={tournament.details}
-                      label="Details"
-                      variant="outlined"
-                      onChange={(e) => {
-                        setDetails(e.target.value);
-                      }}
-                      margin="normal"
-                      multiline
-                    ></TextField>
-                  </FormControl>
-                  <Button
-                    onClick={() => {
-                      editTourney(
-                        id,
-                        title,
-                        venue,
-                        courts,
-                        gender,
-                        fee,
-                        contact,
-                        organizer,
-                        details
-                      );
-                    }}
-                    variant="contained"
-                    color="primary"
-                  >
-                    Update Tournament
-                  </Button>
-                </React.Fragment>
-              ) : null}
-            </React.Fragment>
-          ))
-        : ""}
+      {isOpen === tournament.id ? (
+        <React.Fragment>
+          <FormControl className="create-tournament">
+            <TextField
+              label="Tournament Title"
+              variant="outlined"
+              onChange={(e) =>
+                dispatch(updateTournament({ title: e.target.value }))
+              }
+              margin="normal"
+              required
+              defaultValue={tournament.title}
+            ></TextField>
+          </FormControl>
+          <FormControl className="create-tournament">
+            <TextField
+              defaultValue={tournament.venue}
+              label="Tournament Venue"
+              variant="outlined"
+              onChange={(e) => {
+                dispatch(updateTournament({ venue: e.target.value }));
+              }}
+              margin="normal"
+              required
+            ></TextField>
+          </FormControl>
+          <FormControl className={`create-tournament ${classes.slider}`}>
+            <Typography id="discrete-slider" gutterBottom color="textPrimary">
+              Number of Courts
+            </Typography>
+            <Slider
+              defaultValue={tournament.courts}
+              aria-labelledby="discrete-slider-restrict"
+              step={1}
+              marks
+              min={1}
+              max={8}
+              valueLabelDisplay="auto"
+              value={courts}
+              onChange={(event, value) =>
+                dispatch(updateTournament({ courts: value }))
+              }
+              required
+            />
+          </FormControl>
+          <FormControl
+            variant="outlined"
+            className={`create-tournament ${classes.formControl}`}
+          >
+            <InputLabel id="demo-simple-select-outlined-label">
+              Gender
+            </InputLabel>
+            <Select
+              className={`create-tournament ${classes.selectEmpty}`}
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-outlined"
+              value={gender}
+              onChange={(e) =>
+                dispatch(updateTournament({ gender: e.target.value }))
+              }
+              label="Gender"
+              variant="outlined"
+              defaultValue={tournament.gender}
+            >
+              <MenuItem value={""}>
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value={"Mens"}>Mens</MenuItem>
+              <MenuItem value={"Womens"}>Womens</MenuItem>
+              <MenuItem value={"Mixed"}>Mixed</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth className={classes.margin} variant="outlined">
+            <InputLabel htmlFor="outlined-adornment-amount">
+              Registration Fee
+            </InputLabel>
+            <OutlinedInput
+              id="outlined-adornment-amount"
+              defaultValue={tournament.fee}
+              onChange={(e) =>
+                dispatch(updateTournament({ fee: e.target.value }))
+              }
+              startAdornment={
+                <InputAdornment position="start">$</InputAdornment>
+              }
+              labelWidth={120}
+            />
+          </FormControl>
+          <FormControl className="create-tournament">
+            <TextField
+              defaultValue={tournament.organizer}
+              label="Orgainizer Name"
+              variant="outlined"
+              onChange={(e) => {
+                dispatch(updateTournament({ organizer: e.target.value }));
+              }}
+              margin="normal"
+            ></TextField>
+          </FormControl>
+          <FormControl className="create-tournament">
+            <TextField
+              defaultValue={tournament.contact}
+              label="Contact Phone/Email"
+              variant="outlined"
+              onChange={(e) => {
+                dispatch(updateTournament({ contact: e.target.value }));
+              }}
+              margin="normal"
+            ></TextField>
+          </FormControl>
+          <FormControl className={`create-tournament ${classes.details}`}>
+            <TextField
+              defaultValue={tournament.details}
+              label="Details"
+              variant="outlined"
+              onChange={(e) => {
+                dispatch(updateTournament({ details: e.target.value }));
+              }}
+              margin="normal"
+              multiline
+            ></TextField>
+          </FormControl>
+          {location.pathname === "/edit" ? (
+            <Button
+              onClick={() => {
+                editTourney(
+                  title,
+                  venue,
+                  courts,
+                  gender,
+                  fee,
+                  contact,
+                  organizer,
+                  details
+                );
+              }}
+              variant="contained"
+              color="primary"
+            >
+              Update Tournament
+            </Button>
+          ) : (
+            <Button
+              onClick={() => {
+                createTourney(
+                  title,
+                  venue,
+                  courts,
+                  gender,
+                  fee,
+                  contact,
+                  organizer,
+                  details
+                );
+                dispatch(updateTournaments([...tournaments, ...[tournament]]));
+              }}
+              variant="contained"
+              color="primary"
+            >
+              Create Tournament
+            </Button>
+          )}
+        </React.Fragment>
+      ) : null}
     </div>
   );
 };
