@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
+import Tourneys from "./Tourneys.js";
 
 const Login = (props) => {
-  const { db, provider, user, setUser } = props;
+  const { db, provider } = props;
+  const [user, setUser] = useState(null);
 
   const createUser = async (user) => {
     if (!user.username || !user.userId) {
@@ -35,33 +37,25 @@ const Login = (props) => {
       }
     });
   }, [user]);
+
   return (
-    <div className="login-page">
-      <div className="title">Pickleball Tourneys</div>
+    <React.Fragment>
       {user ? (
-        <React.Fragment>
-          <div className="greeting">Hello, {user.displayName}</div>
+        <Tourneys user={user} setUser={setUser} db={db} />
+      ) : (
+        <div className="login-page">
+          <div className="title">Pickleball Tourneys</div>
           <button
             className="sign-in"
             onClick={async () => {
-              await firebase.auth().signOut();
-              setUser(null);
+              await firebase.auth().signInWithPopup(provider);
             }}
           >
-            Sign Out
+            Sign in with Google
           </button>
-        </React.Fragment>
-      ) : (
-        <button
-          className="sign-in"
-          onClick={async () => {
-            await firebase.auth().signInWithPopup(provider);
-          }}
-        >
-          Sign in with Google
-        </button>
+        </div>
       )}
-    </div>
+    </React.Fragment>
   );
 };
 

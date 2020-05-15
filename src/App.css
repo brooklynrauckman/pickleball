@@ -8,29 +8,27 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  padding: 1rem;
+}
+
+.tourneys {
   max-width: 940px;
-  padding: 2rem 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .login-page {
   width: 100%;
+  height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.login-nav {
-  position: absolute;
-  z-index: 3;
-  right: 0;
-  top: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #048ba8;
 }
 
 .title {
@@ -47,13 +45,13 @@
 }
 
 .sign-in {
-  background-color: #048ba8;
-  color: inherit;
+  background-color: #32cd32;
+  color: white;
   font-weight: bold;
   margin: 1rem;
-  padding: 1rem 2rem;
+  padding: 0.5rem 1rem;
   width: auto;
-  border-radius: 30px;
+  border-radius: 5px;
   font-family: inherit;
   font-size: 1rem;
   outline: none;
@@ -68,47 +66,14 @@
   cursor: pointer;
 }
 
-.sign-out {
-  position: absolute;
-  right: 0;
+.blur {
+  position: fixed;
   top: 0;
-  background-color: #048ba8;
-  color: inherit;
-  font-weight: bold;
-  margin: 1rem;
-  padding: 1rem 2rem;
-  width: auto;
-  border-radius: 30px;
-  font-family: inherit;
-  font-size: 1rem;
-  outline: none;
-  border: none;
-  transform: scale(1);
-  transition: 0.3s ease-in-out;
-}
-
-.remove-decoration {
-  text-decoration: none;
-  color: inherit;
-}
-
-.link {
-  color: inherit;
-  font-weight: bold;
-  margin: 1rem;
-  padding: 1rem 2rem;
-  width: auto;
-  font-family: inherit;
-  font-size: 1rem;
-  outline: none;
-  border: none;
-  transform: scale(1);
-  transition: 0.3s ease-in-out;
-}
-
-.link:hover {
-  transform: scale(1.05);
-  cursor: pointer;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .date-time-picker,
@@ -118,23 +83,23 @@
 }
 
 .tournament {
-  width: calc(100% - 4rem);
-  height: 20rem;
-  /* text-align: center; */
+  width: calc(100% - 2rem);
+  height: auto;
   padding: 1rem 3rem;
-  margin: 2rem;
+  margin: 1rem;
   background: white;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   justify-content: center;
-  border-radius: 30px;
+  border-radius: 15px;
   position: relative;
   color: #2f2d2e;
+  box-shadow: 5px 5px 10px rgb(0, 0, 0, 0.2);
 }
 
 .tournaments {
   width: 100%;
+  padding-top: 2rem;
 }
 
 .completed {
@@ -168,30 +133,34 @@
   transform: scale(1.2);
 }
 
-.options-list {
+.option-buttons {
   position: absolute;
-  top: 0;
   right: 0;
-  height: 100%;
-  width: 100%;
-  padding: 1rem 3rem;
-  border: 2px solid white;
-  border-radius: 30px;
-  background-color: #2e4057;
-  color: white;
-  font-size: 1rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  top: 0;
+  margin: 1rem;
 }
 
 .option {
-  text-align: center;
-  font-size: 1.5rem;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
+  outline: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #3f51b5;
+  color: white;
+  font-weight: bold;
   transform: scale(1);
   transition: 0.3s ease-in-out;
+}
+
+.edit-button {
+  margin-right: 1rem;
+}
+
+.option:hover {
+  cursor: pointer;
+  transform: scale(1.05);
 }
 
 .link-edit {
@@ -225,7 +194,7 @@
   font-size: 1.75rem;
   font-weight: bold;
   align-self: center;
-  padding: 2rem 0;
+  padding: 0 0 1rem 0;
 }
 
 .detail {
@@ -233,32 +202,23 @@
   padding-bottom: 1rem;
 }
 
-.create-button {
-  width: 100%;
-  margin: 1rem;
-  padding: 1rem 2rem;
-  outline: none;
-  font-family: inherit;
-  font-size: 1rem;
-  border-radius: 30px;
-  border: none;
-  background-color: #048ba8;
-  color: inherit;
-  font-weight: bold;
-  transform: scale(1);
-  transition: 0.3s ease-in-out;
-}
-
-.create-button:hover {
-  cursor: pointer;
-  transform: scale(1.05);
+.create-buttons {
+  display: flex;
+  justify-content: center;
 }
 
 .create-form {
+  position: fixed;
+  z-index: 3;
+  right: 0;
+  left: 0;
+  max-height: 650px;
+  overflow: scroll;
   display: flex;
   flex-direction: column;
-  padding: 1rem 2rem 2rem 2rem;
+  padding: 9rem 2rem 2rem 2rem;
   width: 100%;
+  margin: 0 auto;
   max-width: 500px;
   justify-content: center;
   align-items: center;

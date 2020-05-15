@@ -3,13 +3,9 @@ import "./App.css";
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
-import { v4 as uuidv4 } from "uuid";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import Tourneys from "./Tourneys.js";
-import EditTourney from "./EditTourney.js";
 import Login from "./Login.js";
-import Nav from "./Nav.js";
 
 import {
   BrowserRouter as Router,
@@ -36,64 +32,14 @@ const db = firebase.firestore();
 // PROVIDER
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// Generate a new UUID
-const id = uuidv4();
-
 const App = () => {
-  const [user, setUser] = useState(null);
-
-  const [isOpen, setIsOpen] = useState(null);
-
-  const [navToggle, updateNavToggle] = useState(false);
-
   return (
     <Provider store={store}>
       <Router>
         <div className="App">
-          <Nav navToggle={navToggle} updateNavToggle={updateNavToggle} />
           <Switch>
-            <Route exact path="/tourneys">
-              {user ? (
-                <Tourneys isOpen={isOpen} setIsOpen={setIsOpen} user={user} />
-              ) : (
-                <Redirect to="/" />
-              )}
-            </Route>
-            <Route exact path="/create">
-              {user ? (
-                <EditTourney
-                  user={user}
-                  id={id}
-                  isOpen={isOpen}
-                  setIsOpen={setIsOpen}
-                  db={db}
-                />
-              ) : (
-                <Redirect to="/" />
-              )}
-            </Route>
-            <Route exact path="/edit">
-              {user ? (
-                <EditTourney
-                  user={user}
-                  id={id}
-                  isOpen={isOpen}
-                  setIsOpen={setIsOpen}
-                  db={db}
-                />
-              ) : (
-                <Redirect to="/" />
-              )}
-            </Route>
             <Route exact path="/">
-              <Login
-                db={db}
-                provider={provider}
-                user={user}
-                setUser={setUser}
-                navToggle={navToggle}
-                updateNavToggle={updateNavToggle}
-              />
+              <Login db={db} provider={provider} />
             </Route>
           </Switch>
         </div>

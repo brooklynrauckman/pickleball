@@ -2,10 +2,23 @@ import React, { useEffect, useState } from "react";
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { Link } from "react-router-dom";
+import CreateTourney from "./CreateTourney.js";
+import Header from "./Header.js";
+import Blur from "./Blur.js";
+
 const Tourneys = (props) => {
-  const { user, isOpen, setIsOpen } = props;
+  const { user, setUser, db } = props;
   const [tournaments, updateTournaments] = useState([]);
+  const [editable, setEditable] = useState(false);
+  const [createToggle, updateCreateToggle] = useState(false);
+
+  useEffect(() => {
+    if (createToggle) {
+      document.querySelector("body").style.overflowY = "hidden";
+    } else {
+      document.querySelector("body").style.overflowY = "auto";
+    }
+  }, [createToggle]);
 
   const [value] = useCollection(
     firebase
@@ -13,6 +26,45 @@ const Tourneys = (props) => {
       .collection("users")
       .where("userId", "==", user ? user.uid : "")
   );
+
+  // async function editTourney(
+  //   title,
+  //   venue,
+  //   courts,
+  //   gender,
+  //   fee,
+  //   contact,
+  //   organizer,
+  //   details
+  // ) {
+  //   try {
+  //     const querySnapshot = await db
+  //       .collection("users")
+  //       .where("userId", "==", user.uid)
+  //       .get();
+  //     const tempList = querySnapshot.docs[0].get("tournaments");
+  //     for (let t in tempList) {
+  //       if (isOpen === tempList[t].id) {
+  //         tempList[t].title = title;
+  //         tempList[t].venue = venue;
+  //         tempList[t].courts = courts;
+  //         tempList[t].genfer = gender;
+  //         tempList[t].fee = fee;
+  //         tempList[t].contact = contact;
+  //         tempList[t].organizer = organizer;
+  //         tempList[t].details = details;
+  //         querySnapshot.docs[0].ref.update({
+  //           tournaments: tempList,
+  //         });
+  //         window.alert("Tournament update successful!");
+  //         history.push("/tourneys");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     window.alert("Error updating tournament.");
+  //     console.log("Error updating tournament", error);
+  //   }
+  // }
 
   async function deleteTourneys(tournament) {
     const querySnapshot = await value.docs[0].get("tournaments");
@@ -68,6 +120,8 @@ const Tourneys = (props) => {
         let deadlineString = `${monthDeadline}-${dayDeadline}-${yearDeadline} ${hoursDeadline}:${minsDeadline} ${amOrPmDeadline}`;
 
         return {
+          id: tournament.id,
+          admin: tournament.admin,
           title: tournament.title,
           date: dateString,
           venue: tournament.venue,
@@ -87,77 +141,28 @@ const Tourneys = (props) => {
     }
   }, [value, user]);
 
-  useEffect(() => {
-    console.log(isOpen);
-  }, [isOpen]);
-
   return (
-    <div className="tournaments">
-      {tournaments.length
-        ? tournaments.map((tournament) => (
-            <div key={tournament.id} className="tournament">
-              {isOpen === tournament.id ? (
-                <div className="options-list">
-                  <svg
-                    className="options"
-                    onClick={() => setIsOpen(null)}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="25"
-                    height="25"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
-                  <Link to="/edit" className="link-edit">
-                    <div
-                      className="option"
-                      onClick={() => {
-                        setIsOpen(tournament.id);
-                      }}
-                    >
-                      Edit
-                    </div>
-                  </Link>
-                  <div
-                    className="option"
-                    onClick={() => {
-                      setIsOpen(null);
-                      deleteTourneys(tournament);
-                    }}
-                  >
-                    Delete
-                  </div>
-                </div>
-              ) : (
-                <React.Fragment>
-                  <svg
-                    className="options"
-                    id={tournament.id}
-                    onClick={() => {
-                      setIsOpen(tournament.id);
-                      console.log(tournament.id);
-                    }}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="25"
-                    height="25"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
+    <React.Fragment>
+      <Header
+        user={user}
+        setUser={setUser}
+        updateCreateToggle={updateCreateToggle}
+      />
+      <div className="tourneys">
+        {createToggle ? (
+          <React.Fragment>
+            <Blur />
+            <CreateTourney
+              user={user}
+              db={db}
+              updateCreateToggle={updateCreateToggle}
+            />
+          </React.Fragment>
+        ) : null}
+        <div className="tournaments">
+          {tournaments.length
+            ? tournaments.map((tournament) => (
+                <div key={tournament.id} className="tournament">
                   <div className="details-title">{tournament.title}</div>
                   <div className="tournament-details">
                     <div className="detail">
@@ -173,7 +178,7 @@ const Tourneys = (props) => {
                       <strong>Gender:</strong> {tournament.gender}
                     </div>
                     <div className="detail">
-                      <strong>Registration Fee:</strong> {tournament.fee}
+                      <strong>Registration Fee:</strong> $ {tournament.fee}
                     </div>
                     <div className="detail">
                       <strong>Registration Deadline:</strong>{" "}
@@ -189,12 +194,30 @@ const Tourneys = (props) => {
                   <div className="detail">
                     <strong>Details:</strong> {tournament.details}
                   </div>
-                </React.Fragment>
-              )}
-            </div>
-          ))
-        : ""}
-    </div>
+                  <div className="option-buttons">
+                    <button
+                      className="option edit-button"
+                      onClick={() => {
+                        setEditable(true);
+                      }}
+                    >
+                      EDIT
+                    </button>
+                    <button
+                      className="option"
+                      onClick={() => {
+                        deleteTourneys(tournament);
+                      }}
+                    >
+                      DELETE
+                    </button>
+                  </div>
+                </div>
+              ))
+            : ""}
+        </div>
+      </div>
+    </React.Fragment>
   );
 };
 
