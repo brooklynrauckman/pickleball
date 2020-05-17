@@ -1,4 +1,20 @@
 export const initialState = {
-  tournament: {},
-  tournaments: [{ title: "test 1", date: "date 1" }],
+  tournament: {
+    title: "",
+    date: new Date().toISOString(),
+    venue: "",
+    inOrOut: "",
+    courts: 1,
+    gender: "Mixed",
+    minAge: 0,
+    skill: ["1", "2", "3", "4", "5"],
+    type: "Modified",
+    fee: 0,
+    open: new Date().toISOString(),
+    deadline: new Date().toISOString(),
+    contact: "",
+    organizer: "",
+    details: "",
+  },
+  tournaments: [],
 };
