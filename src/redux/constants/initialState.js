@@ -1,7 +1,7 @@
 export const initialState = {
   tournament: {
     title: "",
-    date: new Date().toISOString(),
+    date: null,
     venue: "",
     inOrOut: "",
     courts: 1,
@@ -10,11 +10,21 @@ export const initialState = {
     skill: ["1", "2", "3", "4", "5"],
     type: "Modified",
     fee: 0,
-    open: new Date().toISOString(),
-    deadline: new Date().toISOString(),
+    open: null,
+    deadline: null,
     contact: "",
     organizer: "",
     details: "",
+    participants: [],
   },
   tournaments: [],
+  account: {
+    name: "",
+    email: "",
+    phone: "",
+    zipcode: "",
+    birthdate: null,
+    skill: "",
+    gender: "",
+  },
 };

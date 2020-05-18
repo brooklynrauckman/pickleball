@@ -19,7 +19,9 @@ const Login = (props) => {
         db.collection("users").add({
           username: user.displayName,
           userId: user.uid,
+          setUp: false,
           tournaments: [],
+          account: [],
         });
       }
     }

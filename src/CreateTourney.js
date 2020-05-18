@@ -76,6 +76,7 @@ const CreateTourney = (props) => {
   let contact = tournament.contact;
   let organizer = tournament.organizer;
   let details = tournament.details;
+  let participants = tournament.participants;
 
   async function createTourney(
     title,
@@ -95,7 +96,8 @@ const CreateTourney = (props) => {
     details,
     id,
     admin,
-    user
+    user,
+    participants
   ) {
     try {
       const querySnapshot = await db
@@ -108,7 +110,7 @@ const CreateTourney = (props) => {
         venue: venue,
         inOrOut: inOrOut ? inOrOut : "",
         courts: courts,
-        gender: gender ? gender : "",
+        gender: gender ? gender : "Mixed",
         minAge: minAge ? minAge : 0,
         skill: skill ? skill : ["1", "2", "3", "4", "5"],
         type: type ? type : "Modified",
@@ -120,8 +122,9 @@ const CreateTourney = (props) => {
         details: details ? details : "",
         admin: user.uid,
         id: id,
+        participants: [],
       });
-      console.log("TORNEY", tournaments);
+
       querySnapshot.docs[0].ref.update({
         tournaments: tournaments,
       });
@@ -130,7 +133,6 @@ const CreateTourney = (props) => {
     } catch (error) {
       window.alert("Error creating tournament.");
       console.log("Error creating tournament", error);
-      console.log(tournaments);
     }
   }
 
@@ -258,7 +260,7 @@ const CreateTourney = (props) => {
             Number of Courts
           </Typography>
           <Slider
-            defaultValue={editableTourney ? editableTourney.courts : 1}
+            value={courts}
             aria-labelledby="discrete-slider-restrict"
             step={1}
             marks
@@ -310,7 +312,7 @@ const CreateTourney = (props) => {
           className={`create-tournament ${classes.formControl}`}
         >
           <InputLabel id="demo-simple-select-outlined-label">
-            Skill Levels
+            Skill Level(s)
           </InputLabel>
           <Select
             className={`create-tournament ${classes.selectEmpty}`}
@@ -319,7 +321,7 @@ const CreateTourney = (props) => {
             onChange={(e) =>
               dispatch(updateTournament({ skill: e.target.value }))
             }
-            label="Skill Levels"
+            label="Skill Level(s)"
             variant="outlined"
             value={skill}
             multiple
@@ -488,7 +490,8 @@ const CreateTourney = (props) => {
                   details,
                   id,
                   admin,
-                  user
+                  user,
+                  participants
                 );
                 dispatch(updateTournaments([...tournaments, ...[tournament]]));
               }}
