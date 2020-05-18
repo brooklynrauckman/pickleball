@@ -1,9 +1,14 @@
 import React from "react";
 import "./App.css";
+import * as firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
 import { useSelector, useDispatch } from "react-redux";
-import { updateTournament, updateTournaments } from "./redux/actions/actions";
+import {
+  updateTournament,
+  updateTournaments,
+  updateIds,
+} from "./redux/actions/actions";
 import { MuiPickersUtilsProvider, DateTimePicker } from "@material-ui/pickers";
 import {
   Button,
@@ -55,9 +60,10 @@ const CreateTourney = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const { tournament, tournaments } = useSelector((state) => ({
+  const { tournament, tournaments, ids } = useSelector((state) => ({
     tournament: state.pickleball.tournament,
     tournaments: state.pickleball.tournaments,
+    ids: state.pickleball.ids,
   }));
   const editableTourney = tournaments.filter((t) => t.id === editable)[0];
 
@@ -100,10 +106,7 @@ const CreateTourney = (props) => {
     participants
   ) {
     try {
-      const querySnapshot = await db
-        .collection("users")
-        .where("userId", "==", user.uid)
-        .get();
+      const querySnapshot = await db.collection("tournaments").get();
       tournaments.push({
         title: title,
         date: date ? date.toISOString() : new Date().toISOString(),
@@ -136,6 +139,21 @@ const CreateTourney = (props) => {
     }
   }
 
+  async function createID(id) {
+    try {
+      const querySnapshot = await db
+        .collection("users")
+        .where("userId", "==", user.uid)
+        .get();
+
+      querySnapshot.docs[0].ref.update({
+        ids: firebase.firestore.FieldValue.arrayUnion(id),
+      });
+    } catch (error) {
+      console.log("Error creating ID", error);
+    }
+  }
+
   async function editTourney(
     title,
     date,
@@ -156,10 +174,7 @@ const CreateTourney = (props) => {
     user
   ) {
     try {
-      const querySnapshot = await db
-        .collection("users")
-        .where("userId", "==", user.uid)
-        .get();
+      const querySnapshot = await db.collection("tournaments").get();
       for (let i in tournaments) {
         if (editable === tournaments[i].id) {
           if (title) tournaments[i].title = title;
@@ -177,10 +192,11 @@ const CreateTourney = (props) => {
           if (contact) tournaments[i].contact = contact;
           if (organizer) tournaments[i].organizer = organizer;
           if (details) tournaments[i].details = details;
-          console.log("EDITINO TORNA", tournaments);
+
           querySnapshot.docs[0].ref.update({
             tournaments: tournaments,
           });
+
           window.alert("Tournament update successful!");
         }
       }
@@ -494,6 +510,8 @@ const CreateTourney = (props) => {
                   participants
                 );
                 dispatch(updateTournaments([...tournaments, ...[tournament]]));
+                createID(id);
+                dispatch(updateIds([...ids, ...[id]]));
               }}
               variant="contained"
               color="primary"

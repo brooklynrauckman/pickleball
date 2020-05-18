@@ -27,4 +27,5 @@ export const initialState = {
     skill: "",
     gender: "",
   },
+  ids: [],
 };

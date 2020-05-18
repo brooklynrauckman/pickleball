@@ -7,6 +7,7 @@ import {
   updateTournaments,
   updateTournament,
   updateAccount,
+  updateIds,
 } from "./redux/actions/actions";
 import CreateTourney from "./CreateTourney.js";
 import SetUp from "./SetUp.js";
@@ -27,6 +28,7 @@ const Tourneys = (props) => {
     tournaments: state.pickleball.tournaments,
     tournament: state.pickleball.tournament,
     account: state.pickleball.account,
+    ids: state.pickleball.ids,
   }));
 
   let participants = tournament.participants;
@@ -46,11 +48,14 @@ const Tourneys = (props) => {
       .where("userId", "==", user ? user.uid : "")
   );
 
-  async function deleteTourneys(tournament) {
-    const querySnapshot = await value.docs[0].get("tournaments");
-    const updatedArray = querySnapshot.filter((t) => {
-      if (t.id !== tournament.id) {
-        return t;
+  const [all] = useCollection(firebase.firestore().collection("tournaments"));
+
+  async function deleteTourneys(t) {
+    const querySnapshot = await all.docs[0].get("tournaments");
+
+    const updatedArray = querySnapshot.filter((tmt) => {
+      if (tmt.id !== t.id) {
+        return tmt;
       }
     });
     const c = window.confirm(
@@ -58,7 +63,7 @@ const Tourneys = (props) => {
     );
 
     if (c === true) {
-      value.docs[0].ref.update({
+      all.docs[0].ref.update({
         tournaments: updatedArray,
       });
     } else {
@@ -69,8 +74,8 @@ const Tourneys = (props) => {
   useEffect(() => {
     async function getTourneys() {
       // we assume there is only 1 result so hardcode the [0]
-      const fetchedTourneys = await value.docs[0].get("tournaments");
-      if (fetchedTourneys) {
+      const fetchedTourneys = await all.docs[0].get("tournaments");
+      if (fetchedTourneys.length) {
         const newFetchedTourneys = fetchedTourneys.map((t) => {
           let formatDate = new Date(t.date);
           let dayDate = formatDate.getDate();
@@ -194,32 +199,39 @@ const Tourneys = (props) => {
             skill: fetchedAccount.skill,
           })
         );
-        if (fetchedAccount.name !== "") {
-          updateSetUp(true);
+        if (fetchedAccount.name === "" || fetchedAccount.name === undefined) {
+          updateSetUp(false);
         } else {
-          console.log("new");
+          updateSetUp(true);
         }
       }
     }
-    if (value && value.docs[0] && user) {
+    async function getIds() {
+      // we assume there is only 1 result so hardcode the [0]
+
+      const fetchedIds = await value.docs[0].get("id");
+      if (fetchedIds) {
+        dispatch(updateIds(fetchedIds));
+      }
+    }
+    if (value && value.docs[0] && all && all.docs[0] && user) {
       getTourneys();
       getAccount();
+      getIds();
     }
-  }, [value, user]);
+  }, [value, all, user]);
 
   // WATCHER, when redux updates participants, if there is a tournament ID go update the master list
   useEffect(() => {
     async function addParticipants() {
       try {
-        const querySnapshot = await db
-          .collection("users")
-          .where("userId", "==", user.uid)
-          .get();
+        const querySnapshot = await all.docs[0].get("tournaments");
+
         for (let i in tournaments) {
           if (tournament.id === tournaments[i].id) {
             tournaments[i].participants = tournament.participants;
 
-            querySnapshot.docs[0].ref.update({
+            all.docs[0].ref.update({
               tournaments: tournaments,
             });
           }
@@ -231,7 +243,8 @@ const Tourneys = (props) => {
         console.log("Registration Error", error);
       }
     }
-    if (tournament.id) {
+    if (tournament.id && all && all.docs[0]) {
+      console.log(all.docs[0].get("tournaments"));
       tournaments.map((tmt) => {
         if (
           tmt.id === tournament.id &&
@@ -250,7 +263,7 @@ const Tourneys = (props) => {
         }
       });
     }
-  }, [tournament.participants]);
+  }, [tournament.participants, all]);
 
   return (
     <React.Fragment>
@@ -331,13 +344,15 @@ const Tourneys = (props) => {
                     <div className="detail">
                       <strong>Organizer Contact:</strong> {t.contact}
                     </div>
+                    <div className="detail">
+                      <strong>Participants:</strong> {t.participants.length}
+                    </div>
                   </div>
+
                   <div className="detail">
                     <strong>Details:</strong> {t.details}
                   </div>
-                  <div className="detail">
-                    <strong>Participants:</strong> {t.participants.length}
-                  </div>
+
                   <div className="option-buttons">
                     {user.displayName === "Brooklyn Rauckman" ? (
                       <React.Fragment>
