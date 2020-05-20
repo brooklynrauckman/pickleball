@@ -4,6 +4,10 @@ export const initialState = {
     date: "2020-10-20",
     time: "10:00",
     venue: "",
+    address: "",
+    city: "",
+    state: "",
+    zipcode: "",
     inOrOut: "",
     courts: 1,
     gender: "Mixed",
@@ -18,6 +22,7 @@ export const initialState = {
     organizer: "",
     details: "",
     participants: [],
+    maxPlayers: 16,
   },
   tournaments: [],
   account: {

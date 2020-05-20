@@ -91,12 +91,21 @@ const CreateTourney = (props) => {
   let organizer = tournament.organizer;
   let details = tournament.details;
   let participants = tournament.participants;
+  let maxPlayers = tournament.maxPlayers;
+  let address = tournament.address;
+  let city = tournament.city;
+  let state = tournament.state;
+  let zipcode = tournament.zipcode;
 
   async function createTourney(
     title,
     date,
     time,
     venue,
+    address,
+    city,
+    state,
+    zipcode,
     inOrOut,
     courts,
     gender,
@@ -113,15 +122,29 @@ const CreateTourney = (props) => {
     id,
     admin,
     user,
-    participants
+    participants,
+    maxPlayers
   ) {
     try {
       const querySnapshot = await db.collection("tournaments").get();
+      if (type === "Modified") {
+        if (courts === 2) maxPlayers = 11;
+        if (courts === 3) maxPlayers = 15;
+        if (courts === 4) maxPlayers = 19;
+        if (courts === 5) maxPlayers = 23;
+        if (courts === 6) maxPlayers = 27;
+        if (courts === 7) maxPlayers = 31;
+        if (courts === 8) maxPlayers = 35;
+      }
       tournaments.push({
         title: title,
         date: date,
         time: time,
         venue: venue,
+        address: address,
+        city: city,
+        state: state,
+        zipcode: zipcode,
         inOrOut: inOrOut,
         courts: courts,
         gender: gender,
@@ -138,6 +161,7 @@ const CreateTourney = (props) => {
         admin: user.uid,
         id: id,
         participants: [],
+        maxPlayers: type === "Full" ? courts * 4 : maxPlayers,
       });
 
       querySnapshot.docs[0].ref.update({
@@ -171,6 +195,10 @@ const CreateTourney = (props) => {
     date,
     time,
     venue,
+    address,
+    city,
+    state,
+    zipcode,
     inOrOut,
     courts,
     gender,
@@ -195,12 +223,41 @@ const CreateTourney = (props) => {
           if (date) tournaments[i].date = date;
           if (time) tournaments[i].time = time;
           if (venue) tournaments[i].venue = venue;
+          if (address) tournaments[i].address = address;
+          if (city) tournaments[i].city = city;
+          if (state) tournaments[i].state = state;
+          if (zipcode) tournaments[i].zipcode = zipcode;
           if (inOrOut) tournaments[i].inOrOut = inOrOut;
           if (courts) tournaments[i].courts = courts;
+          if (type && type === "Full") {
+            tournaments[i].type = type;
+            tournaments[i].maxPlayers = courts
+              ? courts * 4
+              : tournaments[i].courts * 4;
+          }
+          if (type && type === "Modified") {
+            tournaments[i].type = type;
+            if (courts) {
+              if (courts === 2) tournaments[i].maxPlayers = 11;
+              if (courts === 3) tournaments[i].maxPlayers = 15;
+              if (courts === 4) tournaments[i].maxPlayers = 19;
+              if (courts === 5) tournaments[i].maxPlayers = 23;
+              if (courts === 6) tournaments[i].maxPlayers = 27;
+              if (courts === 7) tournaments[i].maxPlayers = 31;
+              if (courts === 8) tournaments[i].maxPlayers = 35;
+            } else {
+              if (tournaments[i].courts === 2) tournaments[i].maxPlayers = 11;
+              if (tournaments[i].courts === 3) tournaments[i].maxPlayers = 15;
+              if (tournaments[i].courts === 4) tournaments[i].maxPlayers = 19;
+              if (tournaments[i].courts === 5) tournaments[i].maxPlayers = 23;
+              if (tournaments[i].courts === 6) tournaments[i].maxPlayers = 27;
+              if (tournaments[i].courts === 7) tournaments[i].maxPlayers = 31;
+              if (tournaments[i].courts === 8) tournaments[i].maxPlayers = 35;
+            }
+          }
           if (gender) tournaments[i].gender = gender;
           if (minAge) tournaments[i].minAge = minAge;
           if (skill) tournaments[i].skill = skill;
-          if (type) tournaments[i].type = type;
           if (fee) tournaments[i].fee = fee;
           if (open) tournaments[i].open = open;
           if (deadline) tournaments[i].deadline = deadline;
@@ -285,10 +342,66 @@ const CreateTourney = (props) => {
             defaultValue={
               editableTourney ? editableTourney.venue : tournament.venue
             }
-            label="Tournament Venue"
+            label="Venue Name"
             variant="outlined"
             onChange={(e) => {
               dispatch(updateTournament({ venue: e.target.value }));
+            }}
+            margin="normal"
+            required
+          ></TextField>
+        </FormControl>
+        <FormControl className="create-tournament">
+          <TextField
+            defaultValue={
+              editableTourney ? editableTourney.address : tournament.address
+            }
+            label="Street Address"
+            variant="outlined"
+            onChange={(e) => {
+              dispatch(updateTournament({ address: e.target.value }));
+            }}
+            margin="normal"
+            required
+          ></TextField>
+        </FormControl>
+        <FormControl className="create-tournament">
+          <TextField
+            defaultValue={
+              editableTourney ? editableTourney.city : tournament.city
+            }
+            label="City"
+            variant="outlined"
+            onChange={(e) => {
+              dispatch(updateTournament({ city: e.target.value }));
+            }}
+            margin="normal"
+            required
+          ></TextField>
+        </FormControl>
+        <FormControl className="create-tournament">
+          <TextField
+            defaultValue={
+              editableTourney ? editableTourney.state : tournament.state
+            }
+            label="State"
+            variant="outlined"
+            onChange={(e) => {
+              dispatch(updateTournament({ state: e.target.value }));
+            }}
+            margin="normal"
+            required
+          ></TextField>
+        </FormControl>
+        <FormControl className="create-tournament">
+          <TextField
+            defaultValue={
+              editableTourney ? editableTourney.zipcode : tournament.zipcode
+            }
+            label="Zipcode"
+            variant="outlined"
+            onChange={(e) => {
+              dispatch(updateTournament({ zipcode: e.target.value }));
             }}
             margin="normal"
             required
@@ -530,6 +643,10 @@ const CreateTourney = (props) => {
                   date,
                   time,
                   venue,
+                  address,
+                  city,
+                  state,
+                  zipcode,
                   inOrOut,
                   courts,
                   gender,
@@ -544,7 +661,8 @@ const CreateTourney = (props) => {
                   organizer,
                   details,
                   id,
-                  user
+                  user,
+                  maxPlayers
                 );
                 dispatch(updateTournaments([...tournaments, ...[tournament]]));
               }}
@@ -562,6 +680,10 @@ const CreateTourney = (props) => {
                   date,
                   time,
                   venue,
+                  address,
+                  city,
+                  state,
+                  zipcode,
                   inOrOut,
                   courts,
                   gender,
@@ -578,7 +700,8 @@ const CreateTourney = (props) => {
                   id,
                   admin,
                   user,
-                  participants
+                  participants,
+                  maxPlayers
                 );
                 dispatch(updateTournaments([...tournaments, ...[tournament]]));
                 createID(id);

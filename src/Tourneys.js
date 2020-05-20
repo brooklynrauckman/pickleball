@@ -34,6 +34,69 @@ const Tourneys = (props) => {
   }));
 
   let participants = tournament.participants;
+  let daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  let monthsOfYear = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const convertDate = (t) => {
+    let dateTimestamp = new Date(t.date);
+    let dateDay = dateTimestamp.getDay();
+    let dateMonth = dateTimestamp.getMonth();
+    let dateDate = dateTimestamp.getDate();
+    let dateYear = dateTimestamp.getFullYear();
+    let dateDayOfWeek = daysOfWeek[dateDay];
+    let dateMonthOfYear = monthsOfYear[dateMonth];
+    return ` ${dateDayOfWeek}, ${dateMonthOfYear} ${dateDate}, ${dateYear}`;
+  };
+  const convertDeadline = (t) => {
+    let dateTimestamp = new Date(t.deadline);
+    let dateDay = dateTimestamp.getDay();
+    let dateMonth = dateTimestamp.getMonth();
+    let dateDate = dateTimestamp.getDate();
+    let dateYear = dateTimestamp.getFullYear();
+    let dateDayOfWeek = daysOfWeek[dateDay];
+    let dateMonthOfYear = monthsOfYear[dateMonth];
+    return ` ${dateDayOfWeek}, ${dateMonthOfYear} ${dateDate}, ${dateYear}`;
+  };
+  const convertOpen = (t) => {
+    let dateTimestamp = new Date(t.open);
+    let dateDay = dateTimestamp.getDay();
+    let dateMonth = dateTimestamp.getMonth();
+    let dateDate = dateTimestamp.getDate();
+    let dateYear = dateTimestamp.getFullYear();
+    let dateDayOfWeek = daysOfWeek[dateDay];
+    let dateMonthOfYear = monthsOfYear[dateMonth];
+    return ` ${dateDayOfWeek}, ${dateMonthOfYear} ${dateDate}, ${dateYear}`;
+  };
+
+  const convertTime = (t) => {
+    let timeHours = parseInt(t.time.substring(0, 2));
+    let timeMinutes = parseInt(t.time.substring(3, 5));
+    let convertMinutes = timeMinutes < 10 ? `0${timeMinutes}` : timeMinutes;
+    if (timeHours > 12) return `${timeHours - 12}:${convertMinutes} PM`;
+    if ((timeHours = 12)) return `${timeHours}:${convertMinutes} PM`;
+    if (timeHours < 12) return `${timeHours}:${convertMinutes} AM`;
+  };
 
   useEffect(() => {
     if (createToggle) {
@@ -174,6 +237,10 @@ const Tourneys = (props) => {
             date: t.date,
             time: t.time,
             venue: t.venue,
+            address: t.address,
+            city: t.city,
+            state: t.state,
+            zipcode: t.zipcode,
             inOrOut: t.inOrOut,
             courts: t.courts,
             gender: t.gender,
@@ -188,6 +255,7 @@ const Tourneys = (props) => {
             phone: t.phone,
             details: t.details,
             participants: t.participants,
+            maxPlayers: t.maxPlayers,
           };
         });
 
@@ -270,17 +338,16 @@ const Tourneys = (props) => {
                   <div className="details-title">{t.title}</div>
                   <div className="tournament-details">
                     <div className="detail">
-                      <strong>Date & Time:</strong>{" "}
-                      {`${t.date.substring(5, 7)}/${t.date.substring(
-                        8,
-                        10
-                      )}/${t.date.substring(0, 4)}`}{" "}
-                      {t.time}
+                      <strong>Date & Time:</strong>
+                      {`${convertDate(t)} ${convertTime(t)}`}
                     </div>
                     <div className="detail">
                       <strong>Venue:</strong> {t.venue}
                     </div>
-
+                    <div className="detail">
+                      <strong>Location:</strong>{" "}
+                      {`${t.address}, ${t.city}, ${t.state} ${t.zipcode}`}
+                    </div>
                     <div className="detail">
                       <strong>Number of Courts:</strong> {t.courts} {t.inOrOut}
                     </div>
@@ -307,10 +374,10 @@ const Tourneys = (props) => {
                       </div>
                     ) : null}
                     <div className="detail">
-                      <strong>Registration Start:</strong> {t.open}
+                      <strong>Registration Start:</strong> {convertOpen(t)}
                     </div>
                     <div className="detail">
-                      <strong>Registration End:</strong> {t.deadline}
+                      <strong>Registration End:</strong> {convertDeadline(t)}
                     </div>
 
                     <div className="detail">
@@ -328,7 +395,8 @@ const Tourneys = (props) => {
                     ) : null}
 
                     <div className="detail">
-                      <strong>Participants:</strong> {t.participants.length}
+                      <strong>Participants:</strong>{" "}
+                      {`${t.participants.length} out of ${t.maxPlayers}`}{" "}
                     </div>
                   </div>
                   {t.details ? (
