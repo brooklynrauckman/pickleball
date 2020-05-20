@@ -185,6 +185,7 @@ const Tourneys = (props) => {
             deadline: t.deadline,
             organizer: t.organizer,
             contact: t.contact,
+            phone: t.phone,
             details: t.details,
             participants: t.participants,
           };
@@ -269,23 +270,28 @@ const Tourneys = (props) => {
                   <div className="details-title">{t.title}</div>
                   <div className="tournament-details">
                     <div className="detail">
-                      <strong>Date & Time:</strong> {t.date} {t.time}
+                      <strong>Date & Time:</strong>{" "}
+                      {`${t.date.substring(5, 7)}/${t.date.substring(
+                        8,
+                        10
+                      )}/${t.date.substring(0, 4)}`}{" "}
+                      {t.time}
                     </div>
                     <div className="detail">
                       <strong>Venue:</strong> {t.venue}
                     </div>
+
                     <div className="detail">
-                      <strong>Indoor or Outdoor:</strong> {t.inOrOut}
-                    </div>
-                    <div className="detail">
-                      <strong>Number of Courts:</strong> {t.courts}
+                      <strong>Number of Courts:</strong> {t.courts} {t.inOrOut}
                     </div>
                     <div className="detail">
                       <strong>Gender:</strong> {t.gender}
                     </div>
-                    <div className="detail">
-                      <strong>Minimum Age:</strong> {t.minAge} years
-                    </div>
+                    {t.minAge !== 0 ? (
+                      <div className="detail">
+                        <strong>Minimum Age:</strong> {t.minAge} years
+                      </div>
+                    ) : null}
                     <div className="detail">
                       <strong>Skill Levels: </strong>
                       {t.skill && t.skill.toString() !== "0,6"
@@ -295,30 +301,41 @@ const Tourneys = (props) => {
                     <div className="detail">
                       <strong>Round-Robin Type:</strong> {t.type}
                     </div>
-                    <div className="detail">
-                      <strong>Registration Fee:</strong> ${t.fee}
-                    </div>
+                    {t.fee ? (
+                      <div className="detail">
+                        <strong>Registration Fee:</strong> ${t.fee}
+                      </div>
+                    ) : null}
                     <div className="detail">
                       <strong>Registration Start:</strong> {t.open}
                     </div>
                     <div className="detail">
                       <strong>Registration End:</strong> {t.deadline}
                     </div>
+
                     <div className="detail">
                       <strong>Organizer:</strong> {t.organizer}
                     </div>
-                    <div className="detail">
-                      <strong>Organizer Contact:</strong> {t.contact}
-                    </div>
+                    {t.email ? (
+                      <div className="detail">
+                        <strong>Organizer Email:</strong> {t.contact}
+                      </div>
+                    ) : null}
+                    {t.phone ? (
+                      <div className="detail">
+                        <strong>Organizer Phone:</strong> {t.phone}
+                      </div>
+                    ) : null}
+
                     <div className="detail">
                       <strong>Participants:</strong> {t.participants.length}
                     </div>
                   </div>
-
-                  <div className="detail">
-                    <strong>Details:</strong> {t.details}
-                  </div>
-
+                  {t.details ? (
+                    <div className="detail">
+                      <strong>Details:</strong> {t.details}
+                    </div>
+                  ) : null}
                   <div className="option-buttons">
                     {user.displayName === "Brooklyn Rauckman" ? (
                       <React.Fragment>
@@ -353,14 +370,14 @@ const Tourneys = (props) => {
                                   account.gender === "Female")
                               )
                                 window.alert(
-                                  "Sorry, you do not qualify for this tournament."
+                                  "Sorry, you do not qualify for this tournament based on your gender."
                                 );
                               else if (
-                                account.skill >= t.skill[0] ||
-                                account.skill <= t.skill[2]
+                                account.skill <= t.skill[0] ||
+                                account.skill >= t.skill[1]
                               )
                                 window.alert(
-                                  "Sorry, you do not qualify for this tournament."
+                                  "Sorry, you do not qualify for this tournament based on your skill level."
                                 );
                               else if (
                                 t.minAge >
@@ -368,7 +385,7 @@ const Tourneys = (props) => {
                                   account.birthdate.substring(0, 3)
                               )
                                 window.alert(
-                                  "Sorry, you do not qualify for this tournament."
+                                  "Sorry, you do not qualify for this tournament based on your age."
                                 );
                               else {
                                 dispatch(

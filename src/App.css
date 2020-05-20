@@ -12,7 +12,7 @@
 }
 
 .tourneys {
-  max-width: 940px;
+  max-width: 1060px;
 }
 
 .header {
@@ -83,14 +83,11 @@
 }
 
 .tournament {
-  width: calc(100% - 2rem);
-  height: auto;
-  padding: 1rem 3rem;
-  margin: 1rem;
+  height: 500px;
+  overflow: auto;
+  padding: 4rem 2rem;
   background: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: block;
   border-radius: 15px;
   position: relative;
   color: #2f2d2e;
@@ -98,6 +95,8 @@
 }
 
 .tournaments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   width: 100%;
   padding-top: 2rem;
 }
@@ -182,14 +181,15 @@
 }
 
 .tournament-details {
-  column-count: 2;
+  display: grid;
+  grid-gap: 1rem;
   padding-bottom: 1rem;
 }
 
 .details-title {
   font-size: 1.75rem;
   font-weight: bold;
-  align-self: center;
+  text-align: center;
   padding: 0 0 1rem 0;
 }
 
@@ -210,14 +210,11 @@
   left: 0;
   max-height: 650px;
   overflow: scroll;
-  display: flex;
-  flex-direction: column;
-  padding: 44rem 2rem 2rem 2rem;
+  padding: 2rem;
   width: 100%;
   margin: 0 auto;
   max-width: 500px;
-  justify-content: center;
-  align-items: center;
+  display: block;
   background-color: white;
   border-radius: 30px;
 }
@@ -231,7 +228,7 @@
   overflow: scroll;
   display: flex;
   flex-direction: column;
-  padding: 2rem 2rem 2rem 2rem;
+  padding: 2rem;
   width: 100%;
   margin: 0 auto;
   max-width: 500px;

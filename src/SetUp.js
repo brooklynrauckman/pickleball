@@ -40,6 +40,12 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginRight: theme.spacing(2),
   },
+  bar: {
+    marginTop: theme.spacing(4),
+  },
+  dropdown: {
+    marginLeft: theme.spacing(-1),
+  },
 }));
 
 const SetUp = (props) => {
@@ -123,7 +129,7 @@ const SetUp = (props) => {
             defaultCountry={"us"}
             onChange={(value) => dispatch(updateAccount({ phone: value }))}
             label="Phone Number"
-            value={account.phone ? account.phone : email}
+            value={account.phone ? account.phone : phone}
             margin="normal"
           />
         </FormControl>
@@ -160,7 +166,7 @@ const SetUp = (props) => {
         >
           <InputLabel id="demo-simple-select-outlined-label">Gender</InputLabel>
           <Select
-            className={`create-tournament ${classes.selectEmpty}`}
+            className={`create-tournament ${classes.selectEmpty} ${classes.dropdown}`}
             labelId="demo-simple-select-outlined-label"
             id="demo-simple-select-outlined"
             onChange={(e) =>
@@ -179,13 +185,14 @@ const SetUp = (props) => {
             Skill Level
           </Typography>
           <Slider
+            className={classes.bar}
             value={account.skill ? account.skill : skill}
             aria-labelledby="discrete-slider-restrict"
             step={0.5}
             marks
             min={0}
             max={6}
-            valueLabelDisplay="auto"
+            valueLabelDisplay="on"
             onChange={(event, value) =>
               dispatch(updateAccount({ skill: value }))
             }

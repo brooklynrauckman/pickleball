@@ -23,6 +23,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { v4 as uuidv4 } from "uuid";
+import MuiPhoneNumber from "material-ui-phone-number";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -37,13 +38,20 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
   },
   slider: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
   },
   details: {
     marginBottom: theme.spacing(2),
   },
   button: {
     marginRight: theme.spacing(2),
+  },
+  dropdown: {
+    marginLeft: theme.spacing(-1),
+  },
+  bar: {
+    marginTop: theme.spacing(4),
   },
 }));
 
@@ -79,6 +87,7 @@ const CreateTourney = (props) => {
   let open = tournament.open;
   let deadline = tournament.deadline;
   let contact = tournament.contact;
+  let phone = tournament.phone;
   let organizer = tournament.organizer;
   let details = tournament.details;
   let participants = tournament.participants;
@@ -98,6 +107,7 @@ const CreateTourney = (props) => {
     open,
     deadline,
     contact,
+    phone,
     organizer,
     details,
     id,
@@ -112,18 +122,19 @@ const CreateTourney = (props) => {
         date: date,
         time: time,
         venue: venue,
-        inOrOut: inOrOut ? inOrOut : "",
+        inOrOut: inOrOut,
         courts: courts,
-        gender: gender ? gender : "Mixed",
-        minAge: minAge ? minAge : 0,
-        skill: skill ? skill : ["1", "2", "3", "4", "5"],
-        type: type ? type : "Modified",
-        fee: fee ? fee : 0,
+        gender: gender,
+        minAge: minAge,
+        skill: skill,
+        type: type,
+        fee: fee,
         open: open,
         deadline: deadline,
-        contact: contact ? contact : "",
-        organizer: organizer ? organizer : "",
-        details: details ? details : "",
+        contact: contact,
+        organizer: organizer,
+        phone: phone,
+        details: details,
         admin: user.uid,
         id: id,
         participants: [],
@@ -170,6 +181,7 @@ const CreateTourney = (props) => {
     open,
     deadline,
     contact,
+    phone,
     organizer,
     details,
     id,
@@ -193,6 +205,7 @@ const CreateTourney = (props) => {
           if (open) tournaments[i].open = open;
           if (deadline) tournaments[i].deadline = deadline;
           if (contact) tournaments[i].contact = contact;
+          if (phone) tournaments[i].phone = phone;
           if (organizer) tournaments[i].organizer = organizer;
           if (details) tournaments[i].details = details;
 
@@ -289,7 +302,7 @@ const CreateTourney = (props) => {
             Indoor or Outdoor
           </InputLabel>
           <Select
-            className={`create-tournament ${classes.selectEmpty}`}
+            className={`create-tournament ${classes.selectEmpty} ${classes.dropdown}`}
             labelId="demo-simple-select-outlined-label"
             id="demo-simple-select-outlined"
             onChange={(e) =>
@@ -303,18 +316,42 @@ const CreateTourney = (props) => {
             <MenuItem value={"Outdoor"}>Outdoor</MenuItem>
           </Select>
         </FormControl>
+        <FormControl
+          variant="outlined"
+          className={`create-tournament ${classes.formControl}`}
+        >
+          <InputLabel id="demo-simple-select-outlined-label">
+            Round-Robin Type
+          </InputLabel>
+          <Select
+            className={`create-tournament ${classes.selectEmpty} ${classes.dropdown}`}
+            labelId="demo-simple-select-outlined-label"
+            id="demo-simple-select-outlined"
+            onChange={(e) =>
+              dispatch(updateTournament({ type: e.target.value }))
+            }
+            label="Round-Robin Type"
+            variant="outlined"
+            value={type}
+          >
+            <MenuItem value={"Modified"}>Modified</MenuItem>
+            <MenuItem value={"Full"}>Full</MenuItem>
+          </Select>
+        </FormControl>
+
         <FormControl className={`create-tournament ${classes.slider}`}>
           <Typography id="discrete-slider" gutterBottom color="textPrimary">
             Number of Courts
           </Typography>
           <Slider
+            className={classes.bar}
             value={courts}
             aria-labelledby="discrete-slider-restrict"
             step={1}
             marks
-            min={1}
-            max={8}
-            valueLabelDisplay="auto"
+            min={type === "Full" ? 1 : 2}
+            max={type === "Full" ? 4 : 8}
+            valueLabelDisplay="on"
             onChange={(event, value) =>
               dispatch(updateTournament({ courts: value }))
             }
@@ -327,9 +364,10 @@ const CreateTourney = (props) => {
         >
           <InputLabel id="demo-simple-select-outlined-label">Gender</InputLabel>
           <Select
-            className={`create-tournament ${classes.selectEmpty}`}
+            className={`create-tournament ${classes.selectEmpty} ${classes.dropdown}`}
             labelId="demo-simple-select-outlined-label"
             id="demo-simple-select-outlined"
+            required
             onChange={(e) =>
               dispatch(updateTournament({ gender: e.target.value }))
             }
@@ -360,13 +398,14 @@ const CreateTourney = (props) => {
             Skill Levels
           </Typography>
           <Slider
+            className={classes.bar}
             value={skill}
             aria-labelledby="range-slider"
-            step={1}
+            step={0.5}
             marks
             min={0}
             max={6}
-            valueLabelDisplay="auto"
+            valueLabelDisplay="on"
             onChange={(event, value) =>
               dispatch(updateTournament({ skill: value }))
             }
@@ -374,28 +413,6 @@ const CreateTourney = (props) => {
           />
         </FormControl>
 
-        <FormControl
-          variant="outlined"
-          className={`create-tournament ${classes.formControl}`}
-        >
-          <InputLabel id="demo-simple-select-outlined-label">
-            Round-Robin Type
-          </InputLabel>
-          <Select
-            className={`create-tournament ${classes.selectEmpty}`}
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
-            onChange={(e) =>
-              dispatch(updateTournament({ type: e.target.value }))
-            }
-            label="Round-Robin Type"
-            variant="outlined"
-            value={type}
-          >
-            <MenuItem value={"Modified"}>Modified</MenuItem>
-            <MenuItem value={"Full"}>Full</MenuItem>
-          </Select>
-        </FormControl>
         <FormControl fullWidth className={classes.margin} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-amount">
             Registration Fee
@@ -410,6 +427,7 @@ const CreateTourney = (props) => {
             }
             startAdornment={<InputAdornment position="start">$</InputAdornment>}
             labelWidth={120}
+            className={classes.dropdown}
           />
         </FormControl>
         <FormControl className="create-tournament">
@@ -457,6 +475,7 @@ const CreateTourney = (props) => {
             }
             label="Orgainizer Name"
             variant="outlined"
+            required
             onChange={(e) => {
               dispatch(updateTournament({ organizer: e.target.value }));
             }}
@@ -468,7 +487,7 @@ const CreateTourney = (props) => {
             defaultValue={
               editableTourney ? editableTourney.contact : tournament.contact
             }
-            label="Contact Phone/Email"
+            label="Contact Email"
             variant="outlined"
             onChange={(e) => {
               dispatch(updateTournament({ contact: e.target.value }));
@@ -476,6 +495,17 @@ const CreateTourney = (props) => {
             margin="normal"
           ></TextField>
         </FormControl>
+        <FormControl className="create-tournament">
+          <MuiPhoneNumber
+            variant="outlined"
+            defaultCountry={"us"}
+            onChange={(value) => dispatch(updateTournament({ phone: value }))}
+            label="Contact Phone"
+            value={editableTourney ? editableTourney.phone : phone}
+            margin="normal"
+          />
+        </FormControl>
+
         <FormControl className={`create-tournament ${classes.details}`}>
           <TextField
             defaultValue={
@@ -510,6 +540,7 @@ const CreateTourney = (props) => {
                   open,
                   deadline,
                   contact,
+                  phone,
                   organizer,
                   details,
                   id,
@@ -541,6 +572,7 @@ const CreateTourney = (props) => {
                   open,
                   deadline,
                   contact,
+                  phone,
                   organizer,
                   details,
                   id,

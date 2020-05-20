@@ -14,6 +14,7 @@ export const initialState = {
     open: "2020-09-20",
     deadline: "2020-10-15",
     contact: "",
+    phone: "+1",
     organizer: "",
     details: "",
     participants: [],
