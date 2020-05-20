@@ -12,8 +12,11 @@ import {
   FormControl,
   InputLabel,
   OutlinedInput,
+  Typography,
+  Slider,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import MuiPhoneNumber from "material-ui-phone-number";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -29,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
   slider: {
     marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
   details: {
     marginBottom: theme.spacing(2),
@@ -114,14 +118,14 @@ const SetUp = (props) => {
           ></TextField>
         </FormControl>
         <FormControl className="create-tournament">
-          <TextField
-            label="Phone"
+          <MuiPhoneNumber
             variant="outlined"
-            onChange={(e) => dispatch(updateAccount({ phone: e.target.value }))}
+            defaultCountry={"us"}
+            onChange={(value) => dispatch(updateAccount({ phone: value }))}
+            label="Phone Number"
+            value={account.phone ? account.phone : email}
             margin="normal"
-            required
-            defaultValue={account.phone ? account.phone : phone}
-          ></TextField>
+          />
         </FormControl>
         <FormControl className="create-tournament">
           <TextField
@@ -131,7 +135,6 @@ const SetUp = (props) => {
               dispatch(updateAccount({ zipcode: e.target.value }))
             }
             margin="normal"
-            required
             defaultValue={account.zipcode ? account.zipcode : zipcode}
           ></TextField>
         </FormControl>
@@ -171,29 +174,25 @@ const SetUp = (props) => {
             <MenuItem value={"Female"}>Female</MenuItem>
           </Select>
         </FormControl>
-        <FormControl
-          variant="outlined"
-          className={`create-tournament ${classes.formControl}`}
-        >
-          <InputLabel id="demo-simple-select-outlined-label">
+        <FormControl className={`create-tournament ${classes.slider}`}>
+          <Typography id="discrete-slider" gutterBottom color="textPrimary">
             Skill Level
-          </InputLabel>
-          <Select
-            className={`create-tournament ${classes.selectEmpty}`}
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
-            onChange={(e) => dispatch(updateAccount({ skill: e.target.value }))}
-            label="Skill Level(s)"
-            variant="outlined"
+          </Typography>
+          <Slider
             value={account.skill ? account.skill : skill}
-          >
-            <MenuItem value={"1"}>1</MenuItem>
-            <MenuItem value={"2"}>2</MenuItem>
-            <MenuItem value={"3"}>3</MenuItem>
-            <MenuItem value={"4"}>4</MenuItem>
-            <MenuItem value={"5"}>5</MenuItem>
-          </Select>
+            aria-labelledby="discrete-slider-restrict"
+            step={0.5}
+            marks
+            min={0}
+            max={6}
+            valueLabelDisplay="auto"
+            onChange={(event, value) =>
+              dispatch(updateAccount({ skill: value }))
+            }
+            required
+          />
         </FormControl>
+
         <div className="create-buttons">
           <Button
             className={classes.button}

@@ -9,7 +9,6 @@ import {
   updateTournaments,
   updateIds,
 } from "./redux/actions/actions";
-import { MuiPickersUtilsProvider, DateTimePicker } from "@material-ui/pickers";
 import {
   Button,
   TextField,
@@ -22,7 +21,6 @@ import {
   Typography,
   Slider,
 } from "@material-ui/core";
-import MomentUtils from "@date-io/moment";
 import { makeStyles } from "@material-ui/core/styles";
 import { v4 as uuidv4 } from "uuid";
 
@@ -69,6 +67,7 @@ const CreateTourney = (props) => {
 
   let title = tournament.title;
   let date = tournament.date;
+  let time = tournament.time;
   let venue = tournament.venue;
   let inOrOut = tournament.inOrOut;
   let courts = tournament.courts;
@@ -87,6 +86,7 @@ const CreateTourney = (props) => {
   async function createTourney(
     title,
     date,
+    time,
     venue,
     inOrOut,
     courts,
@@ -109,7 +109,8 @@ const CreateTourney = (props) => {
       const querySnapshot = await db.collection("tournaments").get();
       tournaments.push({
         title: title,
-        date: date ? date.toISOString() : new Date().toISOString(),
+        date: date,
+        time: time,
         venue: venue,
         inOrOut: inOrOut ? inOrOut : "",
         courts: courts,
@@ -118,8 +119,8 @@ const CreateTourney = (props) => {
         skill: skill ? skill : ["1", "2", "3", "4", "5"],
         type: type ? type : "Modified",
         fee: fee ? fee : 0,
-        open: open ? open.toISOString() : new Date().toISOString(),
-        deadline: deadline ? deadline.toISOString() : new Date().toISOString(),
+        open: open,
+        deadline: deadline,
         contact: contact ? contact : "",
         organizer: organizer ? organizer : "",
         details: details ? details : "",
@@ -157,6 +158,7 @@ const CreateTourney = (props) => {
   async function editTourney(
     title,
     date,
+    time,
     venue,
     inOrOut,
     courts,
@@ -178,7 +180,8 @@ const CreateTourney = (props) => {
       for (let i in tournaments) {
         if (editable === tournaments[i].id) {
           if (title) tournaments[i].title = title;
-          if (date) tournaments[i].date = date.toISOString();
+          if (date) tournaments[i].date = date;
+          if (time) tournaments[i].time = time;
           if (venue) tournaments[i].venue = venue;
           if (inOrOut) tournaments[i].inOrOut = inOrOut;
           if (courts) tournaments[i].courts = courts;
@@ -187,8 +190,8 @@ const CreateTourney = (props) => {
           if (skill) tournaments[i].skill = skill;
           if (type) tournaments[i].type = type;
           if (fee) tournaments[i].fee = fee;
-          if (open) tournaments[i].open = open.toISOString();
-          if (deadline) tournaments[i].deadline = deadline.toISOString();
+          if (open) tournaments[i].open = open;
+          if (deadline) tournaments[i].deadline = deadline;
           if (contact) tournaments[i].contact = contact;
           if (organizer) tournaments[i].organizer = organizer;
           if (details) tournaments[i].details = details;
@@ -224,16 +227,45 @@ const CreateTourney = (props) => {
           ></TextField>
         </FormControl>
         <FormControl className="create-tournament">
-          <MuiPickersUtilsProvider utils={MomentUtils}>
-            <DateTimePicker
-              value={date}
-              onChange={(value) => dispatch(updateTournament({ date: value }))}
-              inputVariant="outlined"
-              label="Date & Time"
-              margin="normal"
-              required
-            />
-          </MuiPickersUtilsProvider>
+          <TextField
+            id="date"
+            label="Date"
+            type="date"
+            variant="outlined"
+            margin="normal"
+            required
+            defaultValue={
+              editableTourney ? editableTourney.date : tournament.date
+            }
+            onChange={(e) =>
+              dispatch(updateTournament({ date: e.target.value }))
+            }
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </FormControl>
+        <FormControl className="create-tournament">
+          <TextField
+            id="time"
+            label="Time"
+            type="time"
+            variant="outlined"
+            margin="normal"
+            required
+            defaultValue={
+              editableTourney ? editableTourney.time : tournament.time
+            }
+            onChange={(e) =>
+              dispatch(updateTournament({ time: e.target.value }))
+            }
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              step: 300, // 5 min
+            }}
+          />
         </FormControl>
         <FormControl className="create-tournament">
           <TextField
@@ -323,32 +355,25 @@ const CreateTourney = (props) => {
             margin="normal"
           ></TextField>
         </FormControl>
-        <FormControl
-          variant="outlined"
-          className={`create-tournament ${classes.formControl}`}
-        >
-          <InputLabel id="demo-simple-select-outlined-label">
-            Skill Level(s)
-          </InputLabel>
-          <Select
-            className={`create-tournament ${classes.selectEmpty}`}
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
-            onChange={(e) =>
-              dispatch(updateTournament({ skill: e.target.value }))
-            }
-            label="Skill Level(s)"
-            variant="outlined"
+        <FormControl className={`create-tournament ${classes.slider}`}>
+          <Typography id="range-slider" gutterBottom color="textPrimary">
+            Skill Levels
+          </Typography>
+          <Slider
             value={skill}
-            multiple
-          >
-            <MenuItem value={"1"}>1</MenuItem>
-            <MenuItem value={"2"}>2</MenuItem>
-            <MenuItem value={"3"}>3</MenuItem>
-            <MenuItem value={"4"}>4</MenuItem>
-            <MenuItem value={"5"}>5</MenuItem>
-          </Select>
+            aria-labelledby="range-slider"
+            step={1}
+            marks
+            min={0}
+            max={6}
+            valueLabelDisplay="auto"
+            onChange={(event, value) =>
+              dispatch(updateTournament({ skill: value }))
+            }
+            required
+          />
         </FormControl>
+
         <FormControl
           variant="outlined"
           className={`create-tournament ${classes.formControl}`}
@@ -388,30 +413,42 @@ const CreateTourney = (props) => {
           />
         </FormControl>
         <FormControl className="create-tournament">
-          <MuiPickersUtilsProvider utils={MomentUtils}>
-            <DateTimePicker
-              value={open}
-              onChange={(value) => dispatch(updateTournament({ open: value }))}
-              inputVariant="outlined"
-              label="Registration Start"
-              margin="normal"
-              required
-            />
-          </MuiPickersUtilsProvider>
+          <TextField
+            id="date"
+            label="Registration Start"
+            type="date"
+            variant="outlined"
+            margin="normal"
+            required
+            defaultValue={
+              editableTourney ? editableTourney.open : tournament.open
+            }
+            onChange={(e) =>
+              dispatch(updateTournament({ open: e.target.value }))
+            }
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
         </FormControl>
         <FormControl className="create-tournament">
-          <MuiPickersUtilsProvider utils={MomentUtils}>
-            <DateTimePicker
-              value={deadline}
-              onChange={(value) =>
-                dispatch(updateTournament({ deadline: value }))
-              }
-              inputVariant="outlined"
-              label="Registration End"
-              margin="normal"
-              required
-            />
-          </MuiPickersUtilsProvider>
+          <TextField
+            id="date"
+            label="Registration End"
+            type="date"
+            variant="outlined"
+            margin="normal"
+            required
+            defaultValue={
+              editableTourney ? editableTourney.deadline : tournament.deadline
+            }
+            onChange={(e) =>
+              dispatch(updateTournament({ deadline: e.target.value }))
+            }
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
         </FormControl>
         <FormControl className="create-tournament">
           <TextField
@@ -461,6 +498,7 @@ const CreateTourney = (props) => {
                 editTourney(
                   title,
                   date,
+                  time,
                   venue,
                   inOrOut,
                   courts,
@@ -491,6 +529,7 @@ const CreateTourney = (props) => {
                 createTourney(
                   title,
                   date,
+                  time,
                   venue,
                   inOrOut,
                   courts,

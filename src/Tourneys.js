@@ -21,6 +21,8 @@ const Tourneys = (props) => {
   const [createToggle, updateCreateToggle] = useState(false);
   const [setUpToggle, updateSetUpToggle] = useState(false);
   const [setUp, updateSetUp] = useState(false);
+  const [register, setRegister] = useState(false);
+  const [readyForDb, setReadyForDb] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -71,95 +73,106 @@ const Tourneys = (props) => {
     }
   }
 
+  const deleteParticipant = async (t) => {
+    const myTourney = tournaments.filter((tmt) => tmt.id === t.id);
+    let temp;
+    if (myTourney.length) {
+      const registeredIds = myTourney[0].participants.filter(
+        (p) => p !== user.uid
+      );
+      temp = {
+        ...t,
+        ...{
+          participants: registeredIds,
+        },
+      };
+
+      dispatch(updateTournament(temp));
+    }
+
+    const c = window.confirm(
+      "Press OK to confirm you want to unregister from this tournament."
+    );
+    if (c === true) {
+      dispatch(
+        updateTournaments(
+          tournaments.map((tmt) => {
+            if (tmt.id === temp.id) {
+              return temp;
+            } else return tmt;
+          })
+        )
+      );
+      setReadyForDb(true);
+    } else {
+      console.log("Action Canceled");
+    }
+  };
+
+  useEffect(() => {
+    if (readyForDb) {
+      all.docs[0].ref.update({
+        tournaments: tournaments,
+      });
+      setReadyForDb(false);
+    }
+  }, [readyForDb]);
+
+  // WATCHER, when redux updates participants, if there is a tournament ID go update the master list
+  useEffect(() => {
+    async function addParticipants() {
+      try {
+        const querySnapshot = await all.docs[0].get("tournaments");
+
+        for (let i in tournaments) {
+          if (tournament.id === tournaments[i].id) {
+            tournaments[i].participants = tournament.participants;
+
+            all.docs[0].ref.update({
+              tournaments: tournaments,
+            });
+          }
+        }
+        window.alert("Registration successful!");
+        setRegister(false);
+      } catch (error) {
+        window.alert("Registration Error");
+        console.log("Registration Error", error);
+      }
+    }
+    if (register && tournament.id && all && all.docs[0]) {
+      tournaments.map((tmt) => {
+        if (
+          tmt.id === tournament.id &&
+          !tmt.participants.filter((participant) => participant === user.uid)
+            .length
+        ) {
+          dispatch(
+            updateTournaments(
+              tournaments.map((tmt) => {
+                if (tmt.id === tournament.id) return tournament;
+                else return tmt;
+              })
+            )
+          );
+          addParticipants();
+        }
+      });
+    }
+  }, [tournament.participants, all, register]);
+
   useEffect(() => {
     async function getTourneys() {
       // we assume there is only 1 result so hardcode the [0]
       const fetchedTourneys = await all.docs[0].get("tournaments");
       if (fetchedTourneys.length) {
         const newFetchedTourneys = fetchedTourneys.map((t) => {
-          let formatDate = new Date(t.date);
-          let dayDate = formatDate.getDate();
-          let monthDate = formatDate.getMonth() + 1;
-          let yearDate = formatDate.getFullYear();
-          let hoursDate = formatDate.getHours();
-          let minsDate = formatDate.getMinutes();
-          let amOrPmDate;
-          if (hoursDate > 12 && hoursDate < 24) {
-            hoursDate = hoursDate - 12;
-            amOrPmDate = "PM";
-          } else if (hoursDate < 12 && hoursDate > 0) {
-            amOrPmDate = "AM";
-          } else if (hoursDate === 12) {
-            amOrPmDate = "PM";
-          } else if (hoursDate === 24) {
-            hoursDate = hoursDate - 12;
-            amOrPmDate = "AM";
-          } else if (hoursDate === 0) {
-            hoursDate = hoursDate + 12;
-            amOrPmDate = "AM";
-          }
-          if (minsDate < 10) {
-            minsDate = "0" + minsDate.toString();
-          }
-          let dateString = `${monthDate}-${dayDate}-${yearDate} ${hoursDate}:${minsDate} ${amOrPmDate}`;
-
-          let formatOpen = new Date(t.open);
-          let dayOpen = formatOpen.getDate();
-          let monthOpen = formatOpen.getMonth() + 1;
-          let yearOpen = formatOpen.getFullYear();
-          let hoursOpen = formatOpen.getHours();
-          let minsOpen = formatOpen.getMinutes();
-          let amOrPmOpen;
-          if (hoursOpen > 12 && hoursOpen < 24) {
-            hoursOpen = hoursOpen - 12;
-            amOrPmOpen = "PM";
-          } else if (hoursOpen < 12 && hoursOpen > 0) {
-            amOrPmOpen = "AM";
-          } else if (hoursOpen === 12) {
-            amOrPmOpen = "PM";
-          } else if (hoursOpen === 24) {
-            hoursOpen = hoursOpen - 12;
-            amOrPmOpen = "AM";
-          } else if (hoursOpen === 0) {
-            hoursOpen = hoursOpen + 12;
-            amOrPmOpen = "AM";
-          }
-          if (minsOpen < 10) {
-            minsOpen = "0" + minsOpen.toString();
-          }
-          let openString = `${monthOpen}-${dayOpen}-${yearOpen} ${hoursOpen}:${minsOpen} ${amOrPmOpen}`;
-
-          let formatDeadline = new Date(t.deadline);
-          let dayDeadline = formatDeadline.getDate();
-          let monthDeadline = formatDeadline.getMonth() + 1;
-          let yearDeadline = formatDeadline.getFullYear();
-          let hoursDeadline = formatDeadline.getHours();
-          let minsDeadline = formatDeadline.getMinutes();
-          let amOrPmDeadline;
-          if (hoursDeadline > 12 && hoursDeadline < 24) {
-            hoursDeadline = hoursDeadline - 12;
-            amOrPmDeadline = "PM";
-          } else if (hoursDeadline < 12 && hoursDeadline > 0) {
-            amOrPmDeadline = "AM";
-          } else if (hoursDeadline === 12) {
-            amOrPmDeadline = "PM";
-          } else if (hoursDeadline === 24) {
-            hoursDeadline = hoursDeadline - 12;
-            amOrPmDeadline = "AM";
-          } else if (hoursDeadline === 0) {
-            hoursDeadline = hoursDeadline + 12;
-            amOrPmDeadline = "AM";
-          }
-          if (minsDeadline < 10) {
-            minsDeadline = "0" + minsDeadline.toString();
-          }
-          let deadlineString = `${monthDeadline}-${dayDeadline}-${yearDeadline} ${hoursDeadline}:${minsDeadline} ${amOrPmDeadline}`;
-
           return {
             id: t.id,
             admin: t.admin,
             title: t.title,
-            date: dateString,
+            date: t.date,
+            time: t.time,
             venue: t.venue,
             inOrOut: t.inOrOut,
             courts: t.courts,
@@ -168,8 +181,8 @@ const Tourneys = (props) => {
             skill: t.skill,
             type: t.type,
             fee: t.fee,
-            open: openString,
-            deadline: deadlineString,
+            open: t.open,
+            deadline: t.deadline,
             organizer: t.organizer,
             contact: t.contact,
             details: t.details,
@@ -184,17 +197,12 @@ const Tourneys = (props) => {
       // we assume there is only 1 result so hardcode the [0]
       const fetchedAccount = await value.docs[0].get("account");
       if (fetchedAccount) {
-        let birthdateObj = new Date(fetchedAccount.birthdate);
-        let birthdateYear = birthdateObj.getFullYear();
-        let currentDate = new Date();
-        let currentYear = currentDate.getFullYear();
-        let age = currentYear - birthdateYear;
         dispatch(
           updateAccount({
             name: fetchedAccount.name,
             email: fetchedAccount.email,
             phone: fetchedAccount.phone,
-            birthdate: age,
+            birthdate: fetchedAccount.birthdate,
             gender: fetchedAccount.gender,
             skill: fetchedAccount.skill,
           })
@@ -220,50 +228,6 @@ const Tourneys = (props) => {
       getIds();
     }
   }, [value, all, user]);
-
-  // WATCHER, when redux updates participants, if there is a tournament ID go update the master list
-  useEffect(() => {
-    async function addParticipants() {
-      try {
-        const querySnapshot = await all.docs[0].get("tournaments");
-
-        for (let i in tournaments) {
-          if (tournament.id === tournaments[i].id) {
-            tournaments[i].participants = tournament.participants;
-
-            all.docs[0].ref.update({
-              tournaments: tournaments,
-            });
-          }
-        }
-        window.alert("Registration successful!");
-        console.log("Registration successful", tournament.participants);
-      } catch (error) {
-        window.alert("Registration Error");
-        console.log("Registration Error", error);
-      }
-    }
-    if (tournament.id && all && all.docs[0]) {
-      console.log(all.docs[0].get("tournaments"));
-      tournaments.map((tmt) => {
-        if (
-          tmt.id === tournament.id &&
-          !tmt.participants.filter((participant) => participant === user.uid)
-            .length
-        ) {
-          dispatch(
-            updateTournaments(
-              tournaments.map((tmt) => {
-                if (tmt.id === tournament.id) return tournament;
-                else return tmt;
-              })
-            )
-          );
-          addParticipants();
-        }
-      });
-    }
-  }, [tournament.participants, all]);
 
   return (
     <React.Fragment>
@@ -305,7 +269,7 @@ const Tourneys = (props) => {
                   <div className="details-title">{t.title}</div>
                   <div className="tournament-details">
                     <div className="detail">
-                      <strong>Date & Time:</strong> {t.date}
+                      <strong>Date & Time:</strong> {t.date} {t.time}
                     </div>
                     <div className="detail">
                       <strong>Venue:</strong> {t.venue}
@@ -323,8 +287,10 @@ const Tourneys = (props) => {
                       <strong>Minimum Age:</strong> {t.minAge} years
                     </div>
                     <div className="detail">
-                      <strong>Skill Level(s): </strong>
-                      {t.skill ? t.skill.toString() : "1, 2, 3, 4, 5"}
+                      <strong>Skill Levels: </strong>
+                      {t.skill && t.skill.toString() !== "0,6"
+                        ? `${t.skill[0]}-${t.skill[1]}`
+                        : "All"}
                     </div>
                     <div className="detail">
                       <strong>Round-Robin Type:</strong> {t.type}
@@ -374,45 +340,66 @@ const Tourneys = (props) => {
                         </button>
                       </React.Fragment>
                     ) : (
-                      <button
-                        className="option"
-                        onClick={() => {
-                          if (
-                            (t.gender === "Womens" &&
-                              account.gender === "Male") ||
-                            (t.gender === "Mens" && account.gender === "Female")
-                          )
-                            window.alert(
-                              "Sorry, you do not qualify for this tournament."
-                            );
-                          else if (
-                            !t.skill.filter((s) => s === account.skill).length
-                          )
-                            window.alert(
-                              "Sorry, you do not qualify for this tournament."
-                            );
-                          else if (t.minAge > account.birthdate)
-                            window.alert(
-                              "Sorry, you do not qualify for this tournament."
-                            );
-                          else {
-                            dispatch(
-                              // copy the full tourney plus add a deep key of participants
-                              updateTournament({
-                                ...t,
-                                ...{
-                                  participants: [
-                                    ...t.participants,
-                                    ...[user.uid],
-                                  ],
-                                },
-                              })
-                            );
-                          }
-                        }}
-                      >
-                        REGISTER
-                      </button>
+                      <React.Fragment>
+                        {!t.participants.filter((p) => p === user.uid)
+                          .length ? (
+                          <button
+                            className="option"
+                            onClick={() => {
+                              if (
+                                (t.gender === "Womens" &&
+                                  account.gender === "Male") ||
+                                (t.gender === "Mens" &&
+                                  account.gender === "Female")
+                              )
+                                window.alert(
+                                  "Sorry, you do not qualify for this tournament."
+                                );
+                              else if (
+                                account.skill >= t.skill[0] ||
+                                account.skill <= t.skill[2]
+                              )
+                                window.alert(
+                                  "Sorry, you do not qualify for this tournament."
+                                );
+                              else if (
+                                t.minAge >
+                                t.date.substring(0, 3) -
+                                  account.birthdate.substring(0, 3)
+                              )
+                                window.alert(
+                                  "Sorry, you do not qualify for this tournament."
+                                );
+                              else {
+                                dispatch(
+                                  // copy the full tourney plus add a deep key of participants
+                                  updateTournament({
+                                    ...t,
+                                    ...{
+                                      participants: [
+                                        ...t.participants,
+                                        ...[user.uid],
+                                      ],
+                                    },
+                                  })
+                                );
+                                setRegister(true);
+                              }
+                            }}
+                          >
+                            REGISTER
+                          </button>
+                        ) : (
+                          <button
+                            className="option"
+                            onClick={() => {
+                              deleteParticipant(t);
+                            }}
+                          >
+                            UNREGISTER
+                          </button>
+                        )}
+                      </React.Fragment>
                     )}
                   </div>
                 </div>
