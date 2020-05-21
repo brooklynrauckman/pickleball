@@ -13,12 +13,13 @@
 
 .tourneys {
   max-width: 1060px;
+  align-self: flex-start;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   width: 100%;
 }
 
@@ -40,11 +41,13 @@
 
 .greeting {
   font-size: 1.75rem;
-  margin: 1rem 2rem;
+  margin: 1rem;
   text-align: center;
 }
 
 .sign-in {
+  position: relative;
+  z-index: 3;
   background-color: #32cd32;
   color: white;
   font-weight: bold;
@@ -83,7 +86,7 @@
 }
 
 .tournament {
-  height: 500px;
+  height: 250px;
   overflow: auto;
   padding: 4rem 2rem;
   background: white;
@@ -96,7 +99,7 @@
 
 .tournaments {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   grid-gap: 2rem;
   width: 100%;
   padding-top: 2rem;
@@ -135,7 +138,7 @@
 
 .option-buttons {
   position: absolute;
-  right: 0;
+  left: 0;
   top: 0;
   margin: 1rem;
 }
@@ -237,4 +240,79 @@
   align-items: center;
   background-color: white;
   border-radius: 30px;
+}
+
+.sidebar {
+  z-index: 2;
+  position: fixed;
+  right: 0;
+  top: 0;
+  padding: 8rem 0;
+  height: 100%;
+  width: 340px;
+  background-color: white;
+  overflow: scroll;
+}
+
+.search {
+  width: 100%;
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  box-shadow: 3px 3px 7px rgb(0, 0, 0, 0.2);
+}
+
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.filter {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 2rem;
+  margin-left: 2rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.expand:hover {
+  cursor: pointer;
+}
+
+.expand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #3f51b5;
+  border-radius: 10px;
+  color: white;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  margin-left: 2rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  line-height: 1.5rem;
+}
+
+.category {
+  display: flex;
+  align-items: center;
+}
+
+.hidden {
+  visibility: hidden;
 }

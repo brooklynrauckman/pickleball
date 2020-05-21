@@ -9,7 +9,7 @@ const Header = (props) => {
 
   return (
     <div className="header">
-      <div className="greeting">{user.displayName}'s Pickleball Tourneys</div>
+      <div className="greeting">Hello, {user.displayName}!</div>
       <div>
         {user.displayName === "Brooklyn Rauckman" ? (
           <button className="sign-in" onClick={() => updateCreateToggle(true)}>

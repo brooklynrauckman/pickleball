@@ -11,7 +11,7 @@ import {
 } from "./redux/actions/actions";
 import CreateTourney from "./CreateTourney.js";
 import SetUp from "./SetUp.js";
-
+import Sidebar from "./Sidebar.js";
 import Header from "./Header.js";
 import Blur from "./Blur.js";
 
@@ -307,6 +307,7 @@ const Tourneys = (props) => {
         updateSetUpToggle={updateSetUpToggle}
         setUp={setUp}
       />
+      <Sidebar />
       <div className="tourneys">
         {createToggle || editable ? (
           <React.Fragment>

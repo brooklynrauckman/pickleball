@@ -11,7 +11,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  OutlinedInput,
   Typography,
   Slider,
 } from "@material-ui/core";
