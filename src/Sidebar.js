@@ -17,83 +17,101 @@ const Sidebar = () => {
   const [openFilters, setOpenFilters] = useState([]);
   const [selectedDateFilter, setSelectedDateFilter] = useState("");
   const [selectedLocationFilter, setSelectedLocationFilter] = useState("");
+  const [selectedTypeFilter, setSelectedTypeFilter] = useState("");
+  const [selectedSkillFilter, setSelectedSkillFilter] = useState("");
+  const [selectedAgeFilter, setSelectedAgeFilter] = useState("");
+  const [selectedGenderFilter, setSelectedGenderFilter] = useState("");
 
   useEffect(() => {
     const filterTourneys = async () => {
       const querySnapshot = await all.docs[0].get("tournaments");
       let returnValue = tournaments;
 
-      if (selectedDateFilter === "past")
-        returnValue = querySnapshot.filter(
-          (t) => new Date(t.date).getTime() < new Date().getTime()
-        );
-      if (selectedDateFilter === "week")
-        returnValue = querySnapshot.filter(
-          (t) =>
-            new Date(t.date).getTime() > new Date().getTime() &&
-            new Date(t.date).getTime() < new Date().getTime() + 604800000
-        );
-
-      if (selectedDateFilter === "month")
-        returnValue = querySnapshot.filter(
-          (t) =>
-            new Date(t.date).getTime() > new Date().getTime() &&
-            new Date(t.date).getTime() < new Date().getTime() + 2592000000
-        );
-      if (selectedDateFilter === "twoMonth")
-        returnValue = querySnapshot.filter(
-          (t) =>
-            new Date(t.date).getTime() > new Date().getTime() &&
-            new Date(t.date).getTime() < new Date().getTime() + 5184000000
-        );
-      if (selectedDateFilter === "future")
-        returnValue = querySnapshot.filter(
-          (t) => new Date(t.date).getTime() > new Date().getTime() + 5184000000
-        );
-
-      if (selectedLocationFilter === "ks")
-        returnValue = querySnapshot.filter(
-          (t) => t.state === "Kansas" || t.state === "KS"
-        );
-
-      if (selectedLocationFilter === "ks" && selectedDateFilter === "past")
-        returnValue = querySnapshot.filter(
-          (t) =>
-            (t.state === "Kansas" || t.state === "KS") &&
-            new Date(t.date).getTime() < new Date().getTime()
-        );
-      if (selectedLocationFilter === "ks" && selectedDateFilter === "week")
-        returnValue = querySnapshot.filter(
-          (t) =>
-            (t.state === "Kansas" || t.state === "KS") &&
-            new Date(t.date).getTime() > new Date().getTime() &&
-            new Date(t.date).getTime() < new Date().getTime() + 604800000
-        );
-      if (selectedLocationFilter === "ks" && selectedDateFilter === "month")
-        returnValue = querySnapshot.filter(
-          (t) =>
-            (t.state === "Kansas" || t.state === "KS") &&
-            new Date(t.date).getTime() > new Date().getTime() &&
-            new Date(t.date).getTime() < new Date().getTime() + 2592000000
-        );
-      if (selectedLocationFilter === "ks" && selectedDateFilter === "twoMonth")
-        returnValue = querySnapshot.filter(
-          (t) =>
-            (t.state === "Kansas" || t.state === "KS") &&
-            new Date(t.date).getTime() > new Date().getTime() &&
-            new Date(t.date).getTime() < new Date().getTime() + 5184000000
-        );
-      if (selectedLocationFilter === "ks" && selectedDateFilter === "future")
-        returnValue = querySnapshot.filter(
-          (t) =>
-            (t.state === "Kansas" || t.state === "KS") &&
-            new Date(t.date).getTime() > new Date().getTime() + 5184000000
-        );
-
+      returnValue = querySnapshot.filter(
+        (t) =>
+          ((selectedDateFilter === "past"
+            ? new Date(t.date).getTime() < new Date().getTime()
+            : null) ||
+            (selectedDateFilter === "week"
+              ? new Date(t.date).getTime() > new Date().getTime() &&
+                new Date(t.date).getTime() < new Date().getTime() + 604800000
+              : null) ||
+            (selectedDateFilter === "month"
+              ? new Date(t.date).getTime() > new Date().getTime() &&
+                new Date(t.date).getTime() < new Date().getTime() + 2592000000
+              : null) ||
+            (selectedDateFilter === "twoMonth"
+              ? new Date(t.date).getTime() > new Date().getTime() &&
+                new Date(t.date).getTime() < new Date().getTime() + 5184000000
+              : null) ||
+            (selectedDateFilter === "future"
+              ? new Date(t.date).getTime() > new Date().getTime() + 5184000000
+              : null) ||
+            (selectedDateFilter === "" ? t : null)) &&
+          ((selectedLocationFilter === "ks"
+            ? t.state === "Kansas" || t.state === "KS"
+            : null) ||
+            (selectedLocationFilter === "mo"
+              ? t.state === "Missouri" || t.state === "MO"
+              : null) ||
+            (selectedLocationFilter === "otherState"
+              ? t.state !== "Missouri" &&
+                t.state !== "Kansas" &&
+                t.state !== "MO" &&
+                t.state !== "KS"
+              : null) ||
+            (selectedLocationFilter === "" ? t : null)) &&
+          ((selectedTypeFilter === "modified" ? t.type === "Modified" : null) ||
+            (selectedTypeFilter === "full" ? t.type === "Full" : null) ||
+            (selectedTypeFilter === "" ? t : null)) &&
+          ((selectedSkillFilter === "0-3" ? t.skill[1] <= 3 : null) ||
+            (selectedSkillFilter === "2-5"
+              ? t.skill[0] >= 2 && t.skill[1] <= 5
+              : null) ||
+            (selectedSkillFilter === "3-6"
+              ? t.skill[0] >= 3 && t.skill[1] <= 6
+              : null) ||
+            (selectedSkillFilter === "All"
+              ? t.skill[0] === 0 && t.skill[1] === 6
+              : null) ||
+            (selectedSkillFilter === "" ? t : null)) &&
+          ((selectedAgeFilter === "0-10" ? t.minAge <= 10 : null) ||
+            (selectedAgeFilter === "11-20"
+              ? t.minAge >= 11 && t.minAge <= 20
+              : null) ||
+            (selectedAgeFilter === "21-30"
+              ? t.minAge >= 21 && t.minAge <= 30
+              : null) ||
+            (selectedAgeFilter === "31-40"
+              ? t.minAge >= 31 && t.minAge <= 40
+              : null) ||
+            (selectedAgeFilter === "41-50"
+              ? t.minAge >= 41 && t.minAge <= 50
+              : null) ||
+            (selectedAgeFilter === "51-60"
+              ? t.minAge >= 51 && t.minAge <= 60
+              : null) ||
+            (selectedAgeFilter === "61+" ? t.minAge >= 61 : null) ||
+            (selectedAgeFilter === "" ? t : null)) &&
+          ((selectedGenderFilter === "mens" ? t.gender === "Mens" : null) ||
+            (selectedGenderFilter === "womens"
+              ? t.gender === "Womens"
+              : null) ||
+            (selectedGenderFilter === "mixed" ? t.gender === "Mixed" : null) ||
+            (selectedGenderFilter === "" ? t : null))
+      );
       dispatch(updateTournaments(returnValue));
     };
     if (all) filterTourneys();
-  }, [selectedDateFilter, selectedLocationFilter, all]);
+  }, [
+    selectedDateFilter,
+    selectedLocationFilter,
+    selectedTypeFilter,
+    selectedSkillFilter,
+    selectedAgeFilter,
+    selectedGenderFilter,
+    all,
+  ]);
 
   return (
     <div className="sidebar">
@@ -104,7 +122,21 @@ const Sidebar = () => {
           placeholder="Search for a tournament..."
         />
       </div>
+
       <div className="filters">
+        <div
+          className="clear-filters"
+          onClick={() => {
+            setSelectedAgeFilter("");
+            setSelectedTypeFilter("");
+            setSelectedDateFilter("");
+            setSelectedSkillFilter("");
+            setSelectedGenderFilter("");
+            setSelectedLocationFilter("");
+          }}
+        >
+          Clear filters
+        </div>
         {!!openFilters.filter((f) => f === "date").length ? (
           <React.Fragment>
             <div className="filter">
@@ -272,8 +304,48 @@ const Sidebar = () => {
                   <div>Kansas</div>
                 </div>
               )}
-              <div>Missouri</div>
-              <div>Other</div>
+              {selectedLocationFilter === "mo" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedLocationFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Missouri</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedLocationFilter("mo")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Missouri</div>
+                </div>
+              )}
+              {selectedLocationFilter === "otherState" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedLocationFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Other</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedLocationFilter("otherState")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Other</div>
+                </div>
+              )}
             </div>
           </React.Fragment>
         ) : (
@@ -301,8 +373,48 @@ const Sidebar = () => {
               <div>Round-Robin Type</div>
             </div>
             <div className="categories">
-              <div>Modified</div>
-              <div>Full</div>
+              {selectedTypeFilter === "modified" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedTypeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Modified</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedTypeFilter("modified")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Modified</div>
+                </div>
+              )}
+              {selectedTypeFilter === "full" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedTypeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Full</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedTypeFilter("full")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Full</div>
+                </div>
+              )}
             </div>
           </React.Fragment>
         ) : (
@@ -330,11 +442,90 @@ const Sidebar = () => {
               <div>Skill Level</div>
             </div>
             <div className="categories">
-              <div>0-1.5</div>
-              <div>2-3</div>
-              <div>3.5-4.5</div>
-              <div>5-6</div>
-              <div>All</div>
+              {selectedSkillFilter === "0-3" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedSkillFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>0-3</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedSkillFilter("0-3")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>0-3</div>
+                </div>
+              )}
+              {selectedSkillFilter === "2-5" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedSkillFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>2-5</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedSkillFilter("2-5")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>2-5</div>
+                </div>
+              )}
+              {selectedSkillFilter === "3-6" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedSkillFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>3-6</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedSkillFilter("3-6")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>3-6</div>
+                </div>
+              )}
+              {selectedSkillFilter === "All" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedSkillFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>All</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedSkillFilter("All")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>All</div>
+                </div>
+              )}
             </div>
           </React.Fragment>
         ) : (
@@ -362,13 +553,154 @@ const Sidebar = () => {
               <div>Minimum Age</div>
             </div>
             <div className="categories">
-              <div>0-10</div>
-              <div>11-20</div>
-              <div>21-30</div>
-              <div>31-40</div>
-              <div>41-50</div>
-              <div>51-60</div>
-              <div>61+</div>
+              {selectedAgeFilter === "0-10" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>0-10</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("0-10")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>0-10</div>
+                </div>
+              )}
+              {selectedAgeFilter === "11-20" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>11-20</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("11-20")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>11-20</div>
+                </div>
+              )}
+              {selectedAgeFilter === "21-30" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>21-30</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("21-30")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>21-30</div>
+                </div>
+              )}
+
+              {selectedAgeFilter === "31-40" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>31-40</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("31-40")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>31-40</div>
+                </div>
+              )}
+              {selectedAgeFilter === "41-50" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>41-50</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("41-50")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>41-50</div>
+                </div>
+              )}
+              {selectedAgeFilter === "51-60" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>51-60</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("51-60")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>51-60</div>
+                </div>
+              )}
+              {selectedAgeFilter === "61+" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>61+</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedAgeFilter("61+")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>61+</div>
+                </div>
+              )}
             </div>
           </React.Fragment>
         ) : (
@@ -396,9 +728,69 @@ const Sidebar = () => {
               <div>Gender</div>
             </div>
             <div className="categories">
-              <div>Male</div>
-              <div>Female</div>
-              <div>Mixed</div>
+              {selectedGenderFilter === "mens" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedGenderFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Mens</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedGenderFilter("mens")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Mens</div>
+                </div>
+              )}
+              {selectedGenderFilter === "womens" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedGenderFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Womens</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedGenderFilter("womens")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Womens</div>
+                </div>
+              )}
+              {selectedGenderFilter === "mixed" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedGenderFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Mixed</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedGenderFilter("mixed")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Mixed</div>
+                </div>
+              )}
             </div>
           </React.Fragment>
         ) : (

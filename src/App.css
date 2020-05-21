@@ -281,7 +281,17 @@
   font-weight: bold;
 }
 
-.expand:hover {
+.clear-filters {
+  margin-top: 2rem;
+  margin-left: 2rem;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.expand:hover,
+.clear-filters:hover,
+.category:hover {
   cursor: pointer;
 }
 
