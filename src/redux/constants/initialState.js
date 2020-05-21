@@ -1,8 +1,8 @@
 export const initialState = {
   tournament: {
     title: "",
-    date: "2020-10-20",
-    time: "10:00",
+    date: "2020-05-20",
+    time: "00:00",
     venue: "",
     address: "",
     city: "",
@@ -15,8 +15,8 @@ export const initialState = {
     skill: [0, 6],
     type: "Modified",
     fee: 0,
-    open: "2020-09-20",
-    deadline: "2020-10-15",
+    open: "2020-05-20",
+    deadline: "2020-05-20",
     contact: "",
     phone: "+1",
     organizer: "",

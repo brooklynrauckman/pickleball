@@ -23,6 +23,7 @@ const Tourneys = (props) => {
   const [setUp, updateSetUp] = useState(false);
   const [register, setRegister] = useState(false);
   const [readyForDb, setReadyForDb] = useState(false);
+  const [openTourney, setOpenTourney] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -335,7 +336,27 @@ const Tourneys = (props) => {
         <div className="tournaments">
           {tournaments.length && editable === null && createToggle === false
             ? tournaments.map((t, index) => (
-                <div key={index} className="tournament">
+                <div
+                  key={index}
+                  className={
+                    openTourney === t.id ? "open-tournament" : "tournament"
+                  }
+                >
+                  {openTourney === t.id ? (
+                    <img
+                      src="up.svg"
+                      alt="view less"
+                      className="view-more"
+                      onClick={() => setOpenTourney(null)}
+                    />
+                  ) : (
+                    <img
+                      src="down.svg"
+                      alt="view more"
+                      className="view-more"
+                      onClick={() => setOpenTourney(t.id)}
+                    />
+                  )}
                   <div className="details-title">{t.title}</div>
                   <div className="tournament-details">
                     <div className="detail">
@@ -384,12 +405,12 @@ const Tourneys = (props) => {
                     <div className="detail">
                       <strong>Organizer:</strong> {t.organizer}
                     </div>
-                    {t.email ? (
+                    {t.contact ? (
                       <div className="detail">
                         <strong>Organizer Email:</strong> {t.contact}
                       </div>
                     ) : null}
-                    {t.phone ? (
+                    {t.phone !== "+1" ? (
                       <div className="detail">
                         <strong>Organizer Phone:</strong> {t.phone}
                       </div>
@@ -399,12 +420,13 @@ const Tourneys = (props) => {
                       <strong>Participants:</strong>{" "}
                       {`${t.participants.length} out of ${t.maxPlayers}`}{" "}
                     </div>
+
+                    {t.details ? (
+                      <div className="detail">
+                        <strong>Details:</strong> {t.details}
+                      </div>
+                    ) : null}
                   </div>
-                  {t.details ? (
-                    <div className="detail">
-                      <strong>Details:</strong> {t.details}
-                    </div>
-                  ) : null}
                   <div className="option-buttons">
                     {user.displayName === "Brooklyn Rauckman" ? (
                       <React.Fragment>

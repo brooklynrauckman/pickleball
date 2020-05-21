@@ -10,9 +10,12 @@ const Header = (props) => {
   return (
     <div className="header">
       <div className="greeting">Hello, {user.displayName}!</div>
-      <div>
+      <div className="header-buttons">
         {user.displayName === "Brooklyn Rauckman" ? (
-          <button className="sign-in" onClick={() => updateCreateToggle(true)}>
+          <button
+            className="new-tourney"
+            onClick={() => updateCreateToggle(true)}
+          >
             NEW TOURNEY
           </button>
         ) : null}

@@ -163,12 +163,27 @@ const CreateTourney = (props) => {
         participants: [],
         maxPlayers: type === "Full" ? courts * 4 : maxPlayers,
       });
-
-      querySnapshot.docs[0].ref.update({
-        tournaments: tournaments,
-      });
-
-      window.alert("Tournament creation successful!");
+      if (
+        title === "" ||
+        date === "2020-05-20" ||
+        open === "2020-05-20" ||
+        deadline === "2020-05-20" ||
+        time === "00:00" ||
+        venue === "" ||
+        address === "" ||
+        city === "" ||
+        state === "" ||
+        zipcode === "" ||
+        organizer === ""
+      ) {
+        window.alert("Please fill out all required fields.");
+      } else {
+        querySnapshot.docs[0].ref.update({
+          tournaments: tournaments,
+        });
+        window.alert("Tournament creation successful!");
+        updateCreateToggle(false);
+      }
     } catch (error) {
       window.alert("Error creating tournament.");
       console.log("Error creating tournament", error);
@@ -269,8 +284,8 @@ const CreateTourney = (props) => {
           querySnapshot.docs[0].ref.update({
             tournaments: tournaments,
           });
-
           window.alert("Tournament update successful!");
+          setEditable(null);
         }
       }
     } catch (error) {
@@ -423,7 +438,7 @@ const CreateTourney = (props) => {
             }
             label="Indoor or Outdoor"
             variant="outlined"
-            value={inOrOut}
+            value={editableTourney ? editableTourney.inOrOut : inOrOut}
           >
             <MenuItem value={"Indoor"}>Indoor</MenuItem>
             <MenuItem value={"Outdoor"}>Outdoor</MenuItem>
@@ -445,7 +460,7 @@ const CreateTourney = (props) => {
             }
             label="Round-Robin Type"
             variant="outlined"
-            value={type}
+            value={editableTourney ? editableTourney.type : type}
           >
             <MenuItem value={"Modified"}>Modified</MenuItem>
             <MenuItem value={"Full"}>Full</MenuItem>
@@ -458,7 +473,7 @@ const CreateTourney = (props) => {
           </Typography>
           <Slider
             className={classes.bar}
-            value={courts}
+            value={editableTourney ? editableTourney.courts : courts}
             aria-labelledby="discrete-slider-restrict"
             step={1}
             marks
@@ -486,7 +501,7 @@ const CreateTourney = (props) => {
             }
             label="Gender"
             variant="outlined"
-            value={gender}
+            value={editableTourney ? editableTourney.gender : gender}
           >
             <MenuItem value={"Mens"}>Mens</MenuItem>
             <MenuItem value={"Womens"}>Womens</MenuItem>
@@ -512,7 +527,7 @@ const CreateTourney = (props) => {
           </Typography>
           <Slider
             className={classes.bar}
-            value={skill}
+            value={editableTourney ? editableTourney.skill : skill}
             aria-labelledby="range-slider"
             step={0.5}
             marks

@@ -8,11 +8,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
 }
 
 .tourneys {
+  width: calc(70% - 4rem);
   max-width: 1060px;
+  margin: 0 2rem;
+  padding-bottom: 2rem;
   align-self: flex-start;
 }
 
@@ -21,6 +23,7 @@
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+  margin: 1rem;
 }
 
 .login-page {
@@ -41,8 +44,12 @@
 
 .greeting {
   font-size: 1.75rem;
-  margin: 1rem;
+  margin: 1rem 2rem 1rem 2rem;
   text-align: center;
+}
+
+.header-buttons {
+  margin: 0 1rem;
 }
 
 .sign-in {
@@ -64,9 +71,27 @@
 }
 
 .sign-in:hover,
-.sign-out:hover {
+.new-tourney:hover {
   transform: scale(1.05);
   cursor: pointer;
+}
+
+.new-tourney {
+  position: relative;
+  z-index: 3;
+  background-color: #32cd32;
+  color: white;
+  font-weight: bold;
+  margin: 1rem 0 1rem 1rem;
+  padding: 0.5rem 1rem;
+  width: auto;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  border: none;
+  transform: scale(1);
+  transition: 0.3s ease-in-out;
 }
 
 .blur {
@@ -86,9 +111,23 @@
 }
 
 .tournament {
-  height: 250px;
-  overflow: auto;
-  padding: 4rem 2rem;
+  height: 100px;
+  width: 100%;
+  overflow: hidden;
+  padding: 1rem;
+  background: white;
+  display: block;
+  border-radius: 15px;
+  position: relative;
+  color: #2f2d2e;
+  box-shadow: 5px 5px 10px rgb(0, 0, 0, 0.2);
+}
+
+.open-tournament {
+  height: auto;
+  width: 100%;
+  overflow: hidden;
+  padding: 1rem;
   background: white;
   display: block;
   border-radius: 15px;
@@ -120,27 +159,15 @@
   z-index: 2;
 }
 
-.options-nav {
-  position: absolute;
-  top: 10px;
-  left: 0;
-  margin: 1rem;
-  transform: scale(1);
-  transition: 0.3s ease-in-out;
-  z-index: 2;
-}
-
-.options:hover,
-.options-nav:hover {
+.options:hover {
   cursor: pointer;
   transform: scale(1.2);
 }
 
 .option-buttons {
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin: 1rem;
+  display: flex;
+  width: 100%;
+  justify-content: center;
 }
 
 .option {
@@ -186,14 +213,14 @@
 
 .tournament-details {
   display: grid;
-  grid-gap: 1rem;
+  grid-row-gap: 0.5rem;
   padding-bottom: 1rem;
 }
 
 .details-title {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  text-align: center;
+  text-align: left;
   padding: 0 0 1rem 0;
 }
 
@@ -247,9 +274,9 @@
   position: fixed;
   right: 0;
   top: 0;
-  padding: 8rem 0;
+  padding: 11rem 0;
   height: 100%;
-  width: 340px;
+  width: 30%;
   background-color: white;
   overflow: scroll;
 }
@@ -266,6 +293,8 @@
 }
 
 .search-wrapper {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   width: 100%;
@@ -284,12 +313,13 @@
 .clear-filters {
   margin-top: 2rem;
   margin-left: 2rem;
-  text-align: center;
+  text-align: left;
   font-weight: bold;
   text-decoration: underline;
 }
 
 .expand:hover,
+.clear-search:hover,
 .clear-filters:hover,
 .category:hover {
   cursor: pointer;
@@ -305,6 +335,19 @@
   width: 1rem;
   height: 1rem;
   margin-right: 0.5rem;
+}
+
+.clear-search {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  text-align: center;
+  color: black;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 2rem;
+  margin-top: 1.5rem;
 }
 
 .categories {
@@ -325,4 +368,55 @@
 
 .hidden {
   visibility: hidden;
+}
+
+.view-more {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 1rem;
+}
+
+.view-more:hover {
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+    padding: 2rem;
+    width: calc(100% + 2rem);
+    background-color: white;
+    overflow: hidden;
+  }
+
+  .search {
+    margin-top: 0;
+  }
+  .filters {
+    display: block;
+    width: calc(100% + 2rem);
+  }
+
+  .filter {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 1rem;
+
+    text-align: left;
+  }
+
+  .clear-filters {
+    margin-top: 1rem;
+  }
+
+  .tourneys {
+    width: calc(100% - 4rem);
+    margin: 0 2rem;
+    align-self: center;
+  }
 }

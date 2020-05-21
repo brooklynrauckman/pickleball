@@ -21,6 +21,8 @@ const Sidebar = () => {
   const [selectedSkillFilter, setSelectedSkillFilter] = useState("");
   const [selectedAgeFilter, setSelectedAgeFilter] = useState("");
   const [selectedGenderFilter, setSelectedGenderFilter] = useState("");
+  const [selectedFeeFilter, setSelectedFeeFilter] = useState("");
+  const [search, updateSearch] = useState("");
 
   useEffect(() => {
     const filterTourneys = async () => {
@@ -29,6 +31,16 @@ const Sidebar = () => {
 
       returnValue = querySnapshot.filter(
         (t) =>
+          ((t.title.toLowerCase().includes(search.toLowerCase())
+            ? t.title.toLowerCase().includes(search.toLowerCase())
+            : null) ||
+            (t.venue.toLowerCase().includes(search.toLowerCase())
+              ? t.venue.toLowerCase().includes(search.toLowerCase())
+              : null) ||
+            (t.organizer.toLowerCase().includes(search.toLowerCase())
+              ? t.organizer.toLowerCase().includes(search.toLowerCase())
+              : null) ||
+            (search === "" ? t : null)) &&
           ((selectedDateFilter === "past"
             ? new Date(t.date).getTime() < new Date().getTime()
             : null) ||
@@ -98,7 +110,17 @@ const Sidebar = () => {
               ? t.gender === "Womens"
               : null) ||
             (selectedGenderFilter === "mixed" ? t.gender === "Mixed" : null) ||
-            (selectedGenderFilter === "" ? t : null))
+            (selectedGenderFilter === "" ? t : null)) &&
+          ((selectedFeeFilter === "free" ? t.fee === 0 : null) ||
+            (selectedFeeFilter === "0-10" ? t.fee <= 10 : null) ||
+            (selectedFeeFilter === "10-20"
+              ? t.fee >= 10 && t.fee <= 20
+              : null) ||
+            (selectedFeeFilter === "20-50"
+              ? t.fee >= 20 && t.fee <= 50
+              : null) ||
+            (selectedFeeFilter === "50+" ? t.fee >= 50 : null) ||
+            (selectedFeeFilter === "" ? t : null))
       );
       dispatch(updateTournaments(returnValue));
     };
@@ -110,7 +132,9 @@ const Sidebar = () => {
     selectedSkillFilter,
     selectedAgeFilter,
     selectedGenderFilter,
+    selectedFeeFilter,
     all,
+    search,
   ]);
 
   return (
@@ -120,31 +144,37 @@ const Sidebar = () => {
           className="search"
           type="text"
           placeholder="Search for a tournament..."
+          value={search}
+          onChange={(e) => updateSearch(e.target.value)}
         />
-      </div>
-
-      <div className="filters">
-        <div
-          className="clear-filters"
-          onClick={() => {
-            setSelectedAgeFilter("");
-            setSelectedTypeFilter("");
-            setSelectedDateFilter("");
-            setSelectedSkillFilter("");
-            setSelectedGenderFilter("");
-            setSelectedLocationFilter("");
-          }}
-        >
-          Clear filters
+        <div className="clear-search" onClick={(e) => updateSearch("")}>
+          X
         </div>
+      </div>
+      <div
+        className="clear-filters"
+        onClick={() => {
+          setSelectedAgeFilter("");
+          setSelectedTypeFilter("");
+          setSelectedDateFilter("");
+          setSelectedSkillFilter("");
+          setSelectedGenderFilter("");
+          setSelectedLocationFilter("");
+          setOpenFilters([]);
+        }}
+      >
+        Clear filters
+      </div>
+      <div className="filters">
         {!!openFilters.filter((f) => f === "date").length ? (
           <React.Fragment>
             <div className="filter">
               <div
                 className="expand"
-                onClick={(e) =>
-                  setOpenFilters(openFilters.filter((f) => f !== "date"))
-                }
+                onClick={(e) => {
+                  setOpenFilters(openFilters.filter((f) => f !== "date"));
+                  setSelectedDateFilter("");
+                }}
               >
                 -
               </div>
@@ -274,9 +304,10 @@ const Sidebar = () => {
             <div className="filter">
               <div
                 className="expand"
-                onClick={(e) =>
-                  setOpenFilters(openFilters.filter((f) => f !== "location"))
-                }
+                onClick={(e) => {
+                  setOpenFilters(openFilters.filter((f) => f !== "location"));
+                  setSelectedLocationFilter("");
+                }}
               >
                 -
               </div>
@@ -364,9 +395,10 @@ const Sidebar = () => {
             <div className="filter">
               <div
                 className="expand"
-                onClick={(e) =>
-                  setOpenFilters(openFilters.filter((f) => f !== "type"))
-                }
+                onClick={(e) => {
+                  setOpenFilters(openFilters.filter((f) => f !== "type"));
+                  setSelectedTypeFilter("");
+                }}
               >
                 -
               </div>
@@ -433,9 +465,10 @@ const Sidebar = () => {
             <div className="filter">
               <div
                 className="expand"
-                onClick={(e) =>
-                  setOpenFilters(openFilters.filter((f) => f !== "skill"))
-                }
+                onClick={(e) => {
+                  setOpenFilters(openFilters.filter((f) => f !== "skill"));
+                  setSelectedSkillFilter("");
+                }}
               >
                 -
               </div>
@@ -544,9 +577,10 @@ const Sidebar = () => {
             <div className="filter">
               <div
                 className="expand"
-                onClick={(e) =>
-                  setOpenFilters(openFilters.filter((f) => f !== "age"))
-                }
+                onClick={(e) => {
+                  setOpenFilters(openFilters.filter((f) => f !== "age"));
+                  setSelectedAgeFilter("");
+                }}
               >
                 -
               </div>
@@ -719,9 +753,10 @@ const Sidebar = () => {
             <div className="filter">
               <div
                 className="expand"
-                onClick={(e) =>
-                  setOpenFilters(openFilters.filter((f) => f !== "gender"))
-                }
+                onClick={(e) => {
+                  setOpenFilters(openFilters.filter((f) => f !== "gender"));
+                  setSelectedGenderFilter("");
+                }}
               >
                 -
               </div>
@@ -802,6 +837,139 @@ const Sidebar = () => {
               +
             </div>
             <div>Gender</div>
+          </div>
+        )}
+        {!!openFilters.filter((f) => f === "fee").length ? (
+          <React.Fragment>
+            <div className="filter">
+              <div
+                className="expand"
+                onClick={(e) => {
+                  setOpenFilters(openFilters.filter((f) => f !== "fee"));
+                  setSelectedFeeFilter("");
+                }}
+              >
+                -
+              </div>
+              <div>Fee</div>
+            </div>
+            <div className="categories">
+              {selectedFeeFilter === "free" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Free</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("free")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Free</div>
+                </div>
+              )}
+              {selectedFeeFilter === "0-10" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>$0-10</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("0-10")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>$0-10</div>
+                </div>
+              )}
+              {selectedFeeFilter === "10-20" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>$10-20</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("10-20")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>$10-20</div>
+                </div>
+              )}
+              {selectedFeeFilter === "20-50" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>$20-50</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("20-50")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>$20-50</div>
+                </div>
+              )}
+              {selectedFeeFilter === "50+" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>$50+</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedFeeFilter("50+")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>$50+</div>
+                </div>
+              )}
+            </div>
+          </React.Fragment>
+        ) : (
+          <div className="filter">
+            <div
+              className="expand"
+              onClick={(e) => setOpenFilters([...openFilters, "fee"])}
+            >
+              +
+            </div>
+            <div>Fee</div>
           </div>
         )}
       </div>
