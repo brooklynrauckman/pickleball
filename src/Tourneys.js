@@ -2,26 +2,110 @@ import React, { useEffect, useState } from "react";
 import * as firebase from "firebase/app";
 import "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  updateTournaments,
+  updateTournament,
+  updateAccount,
+  updateIds,
+} from "./redux/actions/actions";
+import CreateTourney from "./CreateTourney.js";
+import SetUp from "./SetUp.js";
+import Sidebar from "./Sidebar.js";
+import Header from "./Header.js";
+import Blur from "./Blur.js";
 
 const Tourneys = (props) => {
-  const {
-    user,
-    title,
-    date,
-    venue,
-    courts,
-    gender,
-    fee,
-    deadline,
-    contact,
-    organizer,
-    details,
-    isOpen,
-    setIsOpen,
-    tournaments,
-    updateTournaments,
-  } = props;
+  const { user, setUser, db, updateSetUpToggle, setUpToggle } = props;
+  const [editable, setEditable] = useState(null);
+  const [createToggle, updateCreateToggle] = useState(false);
+  const [register, setRegister] = useState(false);
+  const [readyForDb, setReadyForDb] = useState(false);
+  const [openTourney, setOpenTourney] = useState(null);
+  const [myTournies, setMyTournies] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const { tournaments, tournament, account } = useSelector((state) => ({
+    tournaments: state.pickleball.tournaments,
+    tournament: state.pickleball.tournament,
+    account: state.pickleball.account,
+    ids: state.pickleball.ids,
+  }));
+
+  let participants = tournament.participants;
+  let currentDate = new Date();
+  let daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  let monthsOfYear = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const convertDate = (t) => {
+    let dateTimestamp = new Date(t.date);
+    let dateDay = dateTimestamp.getDay();
+    let dateMonth = dateTimestamp.getMonth();
+    let dateDate = dateTimestamp.getDate();
+    let dateYear = dateTimestamp.getFullYear();
+    let dateDayOfWeek = daysOfWeek[dateDay];
+    let dateMonthOfYear = monthsOfYear[dateMonth];
+    return ` ${dateDayOfWeek}, ${dateMonthOfYear} ${dateDate}, ${dateYear}`;
+  };
+  const convertDeadline = (t) => {
+    let dateTimestamp = new Date(t.deadline);
+    let dateDay = dateTimestamp.getDay();
+    let dateMonth = dateTimestamp.getMonth();
+    let dateDate = dateTimestamp.getDate();
+    let dateYear = dateTimestamp.getFullYear();
+    let dateDayOfWeek = daysOfWeek[dateDay];
+    let dateMonthOfYear = monthsOfYear[dateMonth];
+    return ` ${dateDayOfWeek}, ${dateMonthOfYear} ${dateDate}, ${dateYear}`;
+  };
+  const convertOpen = (t) => {
+    let dateTimestamp = new Date(t.open);
+    let dateDay = dateTimestamp.getDay();
+    let dateMonth = dateTimestamp.getMonth();
+    let dateDate = dateTimestamp.getDate();
+    let dateYear = dateTimestamp.getFullYear();
+    let dateDayOfWeek = daysOfWeek[dateDay];
+    let dateMonthOfYear = monthsOfYear[dateMonth];
+    return ` ${dateDayOfWeek}, ${dateMonthOfYear} ${dateDate}, ${dateYear}`;
+  };
+
+  const convertTime = (t) => {
+    let timeHours = parseInt(t.time.substring(0, 2));
+    let timeMinutes = parseInt(t.time.substring(3, 5));
+    let convertMinutes = timeMinutes < 10 ? `0${timeMinutes}` : timeMinutes;
+    if (timeHours > 12) return `${timeHours - 12}:${convertMinutes} PM`;
+    if ((timeHours = 12)) return `${timeHours}:${convertMinutes} PM`;
+    if (timeHours < 12) return `${timeHours}:${convertMinutes} AM`;
+  };
+
+  useEffect(() => {
+    if (createToggle) {
+      document.querySelector("body").style.overflowY = "hidden";
+    } else {
+      document.querySelector("body").style.overflowY = "auto";
+    }
+  }, [createToggle]);
 
   const [value] = useCollection(
     firebase
@@ -30,179 +114,457 @@ const Tourneys = (props) => {
       .where("userId", "==", user ? user.uid : "")
   );
 
-  async function deleteTourneys(tournament) {
-    const querySnapshot = await value.docs[0].get("tournaments");
-    const updatedArray = querySnapshot.filter((t) => {
-      if (t.title !== tournament.title) {
-        console.log(t);
-        return t;
+  const [all] = useCollection(firebase.firestore().collection("tournaments"));
+
+  async function deleteTourneys(t) {
+    const querySnapshot = await all.docs[0].get("tournaments");
+
+    const updatedArray = querySnapshot.filter((tmt) => {
+      if (tmt.id !== t.id) {
+        return tmt;
       }
     });
-    value.docs[0].ref.update({
-      tournaments: updatedArray,
-    });
+    const c = window.confirm(
+      "Press OK to confirm you want to delete this tournament."
+    );
+
+    if (c === true) {
+      all.docs[0].ref.update({
+        tournaments: updatedArray,
+      });
+    } else {
+      console.log("Delete Canceled");
+    }
   }
+
+  const deleteParticipant = async (t) => {
+    const myTourney = tournaments.filter((tmt) => tmt.id === t.id);
+    let temp;
+    if (myTourney.length) {
+      const registeredIds = myTourney[0].participants.filter(
+        (p) => p !== user.uid
+      );
+      temp = {
+        ...t,
+        ...{
+          participants: registeredIds,
+        },
+      };
+
+      dispatch(updateTournament(temp));
+    }
+
+    const c = window.confirm(
+      "Press OK to confirm you want to unregister from this tournament."
+    );
+    if (c === true) {
+      dispatch(
+        updateTournaments(
+          tournaments.map((tmt) => {
+            if (tmt.id === temp.id) {
+              return temp;
+            } else return tmt;
+          })
+        )
+      );
+      setReadyForDb(true);
+    } else {
+      console.log("Action Canceled");
+    }
+  };
+
+  useEffect(() => {
+    if (readyForDb) {
+      all.docs[0].ref.update({
+        tournaments: tournaments,
+      });
+      setReadyForDb(false);
+    }
+  }, [readyForDb]);
+
+  // WATCHER, when redux updates participants, if there is a tournament ID go update the master list
+  useEffect(() => {
+    async function addParticipants() {
+      try {
+        const querySnapshot = await all.docs[0].get("tournaments");
+
+        for (let i in tournaments) {
+          if (tournament.id === tournaments[i].id) {
+            tournaments[i].participants = tournament.participants;
+
+            all.docs[0].ref.update({
+              tournaments: tournaments,
+            });
+          }
+        }
+        window.alert("Registration successful!");
+        setRegister(false);
+      } catch (error) {
+        window.alert("Registration Error");
+        console.log("Registration Error", error);
+      }
+    }
+    if (register && tournament.id && all && all.docs[0]) {
+      tournaments.map((tmt) => {
+        if (
+          tmt.id === tournament.id &&
+          !tmt.participants.filter((participant) => participant === user.uid)
+            .length
+        ) {
+          dispatch(
+            updateTournaments(
+              tournaments.map((tmt) => {
+                if (tmt.id === tournament.id) return tournament;
+                else return tmt;
+              })
+            )
+          );
+          addParticipants();
+        }
+      });
+    }
+  }, [tournament.participants, all, register]);
 
   useEffect(() => {
     async function getTourneys() {
       // we assume there is only 1 result so hardcode the [0]
-      const fetchedTourneys = await value.docs[0].get("tournaments");
+      const fetchedTourneys = await all.docs[0].get("tournaments");
+      if (fetchedTourneys.length) {
+        const newFetchedTourneys = fetchedTourneys.map((t) => {
+          return {
+            id: t.id,
+            admin: t.admin,
+            title: t.title,
+            date: t.date,
+            time: t.time,
+            venue: t.venue,
+            address: t.address,
+            city: t.city,
+            state: t.state,
+            zipcode: t.zipcode,
+            inOrOut: t.inOrOut,
+            courts: t.courts,
+            gender: t.gender,
+            minAge: t.minAge,
+            skill: t.skill,
+            type: t.type,
+            fee: t.fee,
+            open: t.open,
+            deadline: t.deadline,
+            organizer: t.organizer,
+            contact: t.contact,
+            phone: t.phone,
+            details: t.details,
+            participants: t.participants,
+            maxPlayers: t.maxPlayers,
+          };
+        });
 
-      const newFetchedTourneys = fetchedTourneys.map((tournament) => {
-        let formatDate = new Date(tournament.date);
-        let dayDate = formatDate.getDate();
-        let monthDate = formatDate.getMonth() + 1;
-        let yearDate = formatDate.getFullYear();
-        let hoursDate = formatDate.getHours();
-        let minsDate = formatDate.getMinutes();
-        let amOrPmDate;
-        if (hoursDate > 12) {
-          hoursDate = hoursDate - 12;
-          amOrPmDate = "PM";
-        } else if (hoursDate < 12) {
-          amOrPmDate = "AM";
-        } else if ((hoursDate = 12)) {
-          amOrPmDate = "PM";
-        }
-        let dateString = `${monthDate}-${dayDate}-${yearDate} ${hoursDate}:${minsDate} ${amOrPmDate}`;
-
-        let formatDeadline = new Date(tournament.deadline);
-        let dayDeadline = formatDeadline.getDate();
-        let monthDeadline = formatDeadline.getMonth() + 1;
-        let yearDeadline = formatDeadline.getFullYear();
-        let hoursDeadline = formatDeadline.getHours();
-        let minsDeadline = formatDeadline.getMinutes();
-        let amOrPmDeadline;
-        if (hoursDeadline > 12) {
-          hoursDeadline = hoursDeadline - 12;
-          amOrPmDeadline = "PM";
-        } else if (hoursDeadline < 12) {
-          amOrPmDeadline = "AM";
-        } else if ((hoursDeadline = 12)) {
-          amOrPmDeadline = "PM";
-        }
-        let deadlineString = `${monthDeadline}-${dayDeadline}-${yearDeadline} ${hoursDeadline}:${minsDeadline} ${amOrPmDeadline}`;
-
-        return {
-          title: tournament.title,
-          date: dateString,
-          venue: tournament.venue,
-          courts: tournament.courts,
-          gender: tournament.gender,
-          fee: tournament.fee,
-          deadline: deadlineString,
-          organizer: tournament.organizer,
-          contact: tournament.contact,
-          details: tournament.details,
-        };
-      });
-      updateTournaments(newFetchedTourneys);
+        dispatch(updateTournaments(newFetchedTourneys));
+      }
     }
-    if (value && value.docs[0] && user) {
+    async function getAccount() {
+      // we assume there is only 1 result so hardcode the [0]
+      const fetchedAccount = await value.docs[0].get("account");
+      if (fetchedAccount) {
+        dispatch(
+          updateAccount({
+            name: fetchedAccount.name,
+            phone: fetchedAccount.phone,
+            birthdate: fetchedAccount.birthdate,
+            gender: fetchedAccount.gender,
+            skill: fetchedAccount.skill,
+            zipcode: fetchedAccount.zipcode,
+            userEmail: fetchedAccount.userEmail,
+          })
+        );
+      }
+    }
+    async function getIds() {
+      // we assume there is only 1 result so hardcode the [0]
+
+      const fetchedIds = await value.docs[0].get("id");
+      if (fetchedIds) {
+        dispatch(updateIds(fetchedIds));
+      }
+    }
+    if (value && value.docs[0] && all && all.docs[0] && user) {
       getTourneys();
+      getAccount();
+      getIds();
     }
-  }, [value]);
+  }, [value, all, user]);
+
+  useEffect(() => {
+    if (all) {
+      const getMyTournies = async () => {
+        const fetchedTourneys = await all.docs[0].get("tournaments");
+        const myTourniesList = fetchedTourneys.filter((t) => {
+          if (t.participants.filter((p) => p === user.uid).length) return t;
+        });
+        console.log(myTourniesList);
+        dispatch(updateTournaments(myTourniesList));
+      };
+      const getAllTournies = async () => {
+        const fetchedTourneys = await all.docs[0].get("tournaments");
+        dispatch(updateTournaments(fetchedTourneys));
+      };
+      if (myTournies) getMyTournies();
+      else {
+        getAllTournies();
+      }
+    }
+  }, [myTournies, all]);
+
   return (
-    <div className="tournaments">
-      {tournaments.length
-        ? tournaments.map((tournament, index) => (
-            <div key={index} className="tournament">
-              {isOpen === index ? (
-                <div className="options-list">
-                  <svg
-                    className="options"
-                    onClick={() => setIsOpen(null)}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="25"
-                    height="25"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
-                  <Link to="/edit" className="link-edit">
-                    <div
-                      className="option"
-                      onClick={() => {
-                        setIsOpen(index);
-                      }}
-                    >
-                      Edit
-                    </div>
-                  </Link>
-                  <div
-                    className="option"
-                    onClick={() => {
-                      setIsOpen(null);
-                      deleteTourneys(tournament);
-                    }}
-                  >
-                    Delete
-                  </div>
-                </div>
-              ) : (
-                <React.Fragment>
-                  <svg
-                    className="options"
-                    id={tournament.id}
-                    onClick={() => setIsOpen(index)}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="25"
-                    height="25"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
-                  <div className="details-title">{tournament.title}</div>
+    <React.Fragment>
+      <Header
+        user={user}
+        setUser={setUser}
+        updateCreateToggle={updateCreateToggle}
+        updateSetUpToggle={updateSetUpToggle}
+        setMyTournies={setMyTournies}
+        myTournies={myTournies}
+      />
+      <Sidebar />
+      <div className="tourneys">
+        {createToggle || editable ? (
+          <React.Fragment>
+            <Blur />
+            <CreateTourney
+              user={user}
+              db={db}
+              updateCreateToggle={updateCreateToggle}
+              setEditable={setEditable}
+              editable={editable}
+            />
+          </React.Fragment>
+        ) : null}
+        {setUpToggle ? (
+          <React.Fragment>
+            <Blur />
+            <SetUp db={db} user={user} updateSetUpToggle={updateSetUpToggle} />
+          </React.Fragment>
+        ) : null}
+        <div className="tournaments">
+          {tournaments.length && editable === null && createToggle === false
+            ? tournaments.map((t, index) => (
+                <div
+                  key={index}
+                  className={
+                    openTourney === t.id ? "open-tournament" : "tournament"
+                  }
+                >
+                  {openTourney === t.id ? (
+                    <img
+                      src="up.svg"
+                      alt="view less"
+                      className="view-more"
+                      onClick={() => setOpenTourney(null)}
+                    />
+                  ) : (
+                    <img
+                      src="down.svg"
+                      alt="view more"
+                      className="view-more"
+                      onClick={() => setOpenTourney(t.id)}
+                    />
+                  )}
+                  <div className="details-title">{t.title}</div>
                   <div className="tournament-details">
                     <div className="detail">
-                      <strong>Date & Time:</strong> {tournament.date}
+                      <strong>Date & Time:</strong>
+                      {`${convertDate(t)} ${convertTime(t)}`}
                     </div>
                     <div className="detail">
-                      <strong>Venue:</strong> {tournament.venue}
+                      <strong>Venue:</strong> {t.venue}
                     </div>
                     <div className="detail">
-                      <strong>Number of Courts:</strong> {tournament.courts}
+                      <strong>Location:</strong>{" "}
+                      {`${t.address}, ${t.city}, ${t.state} ${t.zipcode}`}
                     </div>
                     <div className="detail">
-                      <strong>Gender:</strong> {tournament.gender}
+                      <strong>Number of Courts:</strong> {t.courts} {t.inOrOut}
                     </div>
                     <div className="detail">
-                      <strong>Registration Fee:</strong> {tournament.fee}
+                      <strong>Gender:</strong> {t.gender}
+                    </div>
+                    {t.minAge !== 0 ? (
+                      <div className="detail">
+                        <strong>Minimum Age:</strong> {t.minAge} years
+                      </div>
+                    ) : null}
+                    <div className="detail">
+                      <strong>Skill Levels: </strong>
+                      {t.skill && t.skill.toString() !== "0,6"
+                        ? `${t.skill[0]}-${t.skill[1]}`
+                        : "All"}
                     </div>
                     <div className="detail">
-                      <strong>Registration Deadline:</strong>{" "}
-                      {tournament.deadline}
+                      <strong>Round-Robin Type:</strong> {t.type}
+                    </div>
+                    {t.fee ? (
+                      <div className="detail">
+                        <strong>Registration Fee:</strong> ${t.fee}
+                      </div>
+                    ) : null}
+                    <div className="detail">
+                      <strong>Registration Start:</strong> {convertOpen(t)}
                     </div>
                     <div className="detail">
-                      <strong>Organizer:</strong> {tournament.organizer}
+                      <strong>Registration End:</strong> {convertDeadline(t)}
                     </div>
+
                     <div className="detail">
-                      <strong>Organizer Contact:</strong> {tournament.contact}
+                      <strong>Organizer:</strong> {t.organizer}
                     </div>
+                    {t.contact ? (
+                      <div className="detail">
+                        <strong>Organizer Email:</strong> {t.contact}
+                      </div>
+                    ) : null}
+                    {t.phone !== "+1" ? (
+                      <div className="detail">
+                        <strong>Organizer Phone:</strong> {t.phone}
+                      </div>
+                    ) : null}
+
+                    <div className="detail">
+                      <strong>Participants:</strong>{" "}
+                      {`${t.participants.length} out of ${t.maxPlayers}`}{" "}
+                    </div>
+
+                    {t.details ? (
+                      <div className="detail">
+                        <strong>Details:</strong> {t.details}
+                      </div>
+                    ) : null}
                   </div>
-                  <div className="detail">
-                    <strong>Details:</strong> {tournament.details}
+                  <div className="option-buttons">
+                    {user.uid === "DsoWpqEyMrcx6m8ViOy32uRuWjC2" ? (
+                      <React.Fragment>
+                        <button
+                          className="option edit-button"
+                          onClick={() => {
+                            setEditable(t.id);
+                          }}
+                        >
+                          EDIT
+                        </button>
+                        <button
+                          className="option"
+                          onClick={() => {
+                            deleteTourneys(t);
+                          }}
+                        >
+                          DELETE
+                        </button>
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        {t.deadline.substring(0, 4) <
+                          currentDate.getFullYear() ||
+                        (t.deadline.substring(5, 7) <
+                          currentDate.getMonth() + 1 &&
+                          t.deadline.substring(0, 4) ==
+                            currentDate.getFullYear()) ||
+                        (t.deadline.substring(5, 7) ==
+                          currentDate.getMonth() + 1 &&
+                          t.deadline.substring(8, 10) <
+                            currentDate.getDate() + 1 &&
+                          t.deadline.substring(0, 4) ==
+                            currentDate.getFullYear()) ||
+                        t.open.substring(0, 4) > currentDate.getFullYear() ||
+                        (t.open.substring(5, 7) > currentDate.getMonth() + 1 &&
+                          t.open.substring(0, 4) ==
+                            currentDate.getFullYear()) ||
+                        (t.open.substring(5, 7) == currentDate.getMonth() + 1 &&
+                          t.open.substring(8, 10) > currentDate.getDate() + 1 &&
+                          t.open.substring(0, 4) ==
+                            currentDate.getFullYear()) ? null : (
+                          <React.Fragment>
+                            {!t.participants.filter((p) => p === user.uid)
+                              .length ? (
+                              <React.Fragment>
+                                {t.participants.length >= t.maxPlayers ? (
+                                  <button
+                                    className="option"
+                                    onClick={() => {
+                                      console.log("WAITLIST");
+                                    }}
+                                  >
+                                    WAITLIST
+                                  </button>
+                                ) : (
+                                  <button
+                                    className="option"
+                                    onClick={() => {
+                                      if (
+                                        (t.gender === "Womens" &&
+                                          account.gender === "Male") ||
+                                        (t.gender === "Mens" &&
+                                          account.gender === "Female")
+                                      )
+                                        window.alert(
+                                          "Sorry, you do not qualify for this tournament based on your gender."
+                                        );
+                                      else if (
+                                        account.skill < t.skill[0] ||
+                                        account.skill > t.skill[1]
+                                      )
+                                        window.alert(
+                                          "Sorry, you do not qualify for this tournament based on your skill level."
+                                        );
+                                      else if (
+                                        t.minAge >
+                                        t.date.substring(0, 4) -
+                                          account.birthdate.substring(0, 4)
+                                      )
+                                        window.alert(
+                                          "Sorry, you do not qualify for this tournament based on your age."
+                                        );
+                                      else {
+                                        dispatch(
+                                          // copy the full tourney plus add a deep key of participants
+                                          updateTournament({
+                                            ...t,
+                                            ...{
+                                              participants: [
+                                                ...t.participants,
+                                                ...[user.uid],
+                                              ],
+                                            },
+                                          })
+                                        );
+                                        setRegister(true);
+                                      }
+                                    }}
+                                  >
+                                    REGISTER
+                                  </button>
+                                )}
+                              </React.Fragment>
+                            ) : (
+                              <button
+                                className="option"
+                                onClick={() => {
+                                  deleteParticipant(t);
+                                }}
+                              >
+                                UNREGISTER
+                              </button>
+                            )}
+                          </React.Fragment>
+                        )}
+                      </React.Fragment>
+                    )}
                   </div>
-                </React.Fragment>
-              )}
-            </div>
-          ))
-        : ""}
-    </div>
+                </div>
+              ))
+            : ""}
+        </div>
+      </div>
+    </React.Fragment>
   );
 };
 
