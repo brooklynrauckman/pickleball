@@ -35,6 +35,17 @@
   justify-content: center;
 }
 
+.login-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-controls {
+  width: 100%;
+  margin: 2rem;
+  max-width: 400px;
+}
+
 .title {
   font-size: 3.25rem;
   font-weight: bold;
@@ -54,11 +65,12 @@
 
 .sign-in {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   background-color: #32cd32;
   color: white;
   font-weight: bold;
-  margin: 1rem;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
   padding: 0.5rem 1rem;
   width: auto;
   border-radius: 5px;
@@ -70,28 +82,43 @@
   transition: 0.3s ease-in-out;
 }
 
-.sign-in:hover,
-.new-tourney:hover {
-  transform: scale(1.05);
+.header-options {
+  position: relative;
+  z-index: 2;
+  font-weight: bold;
+  margin: 1rem;
+  padding: 10px 8px;
+  width: auto;
+  background-color: inherit;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  border: 1px solid black;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  transition: 0.3s ease-in-out;
+}
+.active {
+  border: 3px solid #32cd32;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 8px 8px;
+}
+
+.sign-in:hover {
+  transform: scale(1.03);
   cursor: pointer;
 }
 
-.new-tourney {
-  position: relative;
-  z-index: 3;
-  background-color: #32cd32;
-  color: white;
-  font-weight: bold;
-  margin: 1rem 0 1rem 1rem;
-  padding: 0.5rem 1rem;
-  width: auto;
-  border-radius: 5px;
-  font-family: inherit;
-  font-size: 1rem;
-  outline: none;
-  border: none;
-  transform: scale(1);
-  transition: 0.3s ease-in-out;
+.header-options:hover {
+  cursor: pointer;
+  border: 3px solid #32cd32;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 8px 8px;
 }
 
 .blur {
@@ -255,16 +282,14 @@
   z-index: 3;
   right: 0;
   left: 0;
-  max-height: 650px;
+  top: 0;
+  max-height: 600px;
   overflow: scroll;
-  display: flex;
-  flex-direction: column;
   padding: 2rem;
   width: 100%;
-  margin: 0 auto;
+  height: 100%;
+  margin: 7rem auto;
   max-width: 500px;
-  justify-content: center;
-  align-items: center;
   background-color: white;
   border-radius: 30px;
 }
@@ -381,7 +406,7 @@
   cursor: pointer;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .sidebar {
     position: relative;
     display: flex;
@@ -412,6 +437,10 @@
 
   .clear-filters {
     margin-top: 1rem;
+  }
+
+  .clear-search {
+    margin-top: 0.5rem;
   }
 
   .tourneys {

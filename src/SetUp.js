@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SetUp = (props) => {
-  const { user, db, updateSetUpToggle, setUp } = props;
+  const { user, db, updateSetUpToggle } = props;
 
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -58,178 +58,141 @@ const SetUp = (props) => {
   }));
 
   let name = account.name;
-  let email = account.email;
   let phone = account.phone;
   let zipcode = account.zipcode;
   let birthdate = account.birthdate;
   let skill = account.skill;
   let gender = account.gender;
 
-  async function createAccount(
-    name,
-    email,
-    phone,
-    zipcode,
-    birthdate,
-    skill,
-    gender
-  ) {
+  async function editAccount(name, phone, zipcode, birthdate, skill, gender) {
     try {
       const querySnapshot = await db
         .collection("users")
         .where("userId", "==", user.uid)
         .get();
+      if (name) account.name = name;
+      if (phone) account.phone = phone;
+      if (zipcode) account.zipcode = zipcode;
+      if (birthdate) account.birthdate = birthdate;
+      if (skill) account.skill = skill;
+      if (gender) account.gender = gender;
 
       querySnapshot.docs[0].ref.update({
-        account: {
-          name: name,
-          email: email,
-          phone: phone,
-          zipcode: zipcode,
-          birthdate: birthdate,
-          skill: skill,
-          gender: gender,
-        },
+        account: account,
       });
       window.alert("Account update successful!");
-      console.log("Account update successful", account);
+      updateSetUpToggle(false);
     } catch (error) {
-      window.alert("Error creating account.");
-      console.log("Error creating account", error);
+      window.alert("Error updating account.");
+      console.log("Error updating account", error);
     }
   }
 
   return (
-    <React.Fragment>
-      <div className="account-form">
-        <FormControl className="create-tournament">
-          <TextField
-            label="Name"
-            variant="outlined"
-            onChange={(e) => dispatch(updateAccount({ name: e.target.value }))}
-            margin="normal"
-            required
-            defaultValue={account.name ? account.name : name}
-          ></TextField>
-        </FormControl>
-        <FormControl className="create-tournament">
-          <TextField
-            label="Email"
-            variant="outlined"
-            onChange={(e) => dispatch(updateAccount({ email: e.target.value }))}
-            margin="normal"
-            required
-            defaultValue={account.email ? account.email : email}
-          ></TextField>
-        </FormControl>
-        <FormControl className="create-tournament">
-          <MuiPhoneNumber
-            variant="outlined"
-            defaultCountry={"us"}
-            onChange={(value) => dispatch(updateAccount({ phone: value }))}
-            label="Phone Number"
-            value={account.phone ? account.phone : phone}
-            margin="normal"
-          />
-        </FormControl>
-        <FormControl className="create-tournament">
-          <TextField
-            label="Zipcode"
-            variant="outlined"
-            onChange={(e) =>
-              dispatch(updateAccount({ zipcode: e.target.value }))
-            }
-            margin="normal"
-            defaultValue={account.zipcode ? account.zipcode : zipcode}
-          ></TextField>
-        </FormControl>
-        <FormControl className="create-tournament">
-          <TextField
-            id="date"
-            label="Birthdate"
-            type="date"
-            variant="outlined"
-            margin="normal"
-            defaultValue={account.birthdate ? account.birthdate : birthdate}
-            onChange={(e) =>
-              dispatch(updateAccount({ birthdate: e.target.value }))
-            }
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </FormControl>
-        <FormControl
+    <div className="account-form">
+      <FormControl className="create-tournament">
+        <TextField
+          label="Name"
           variant="outlined"
-          className={`create-tournament ${classes.formControl}`}
-        >
-          <InputLabel id="demo-simple-select-outlined-label">Gender</InputLabel>
-          <Select
-            className={`create-tournament ${classes.selectEmpty} ${classes.dropdown}`}
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
-            onChange={(e) =>
-              dispatch(updateAccount({ gender: e.target.value }))
-            }
-            label="Gender"
-            variant="outlined"
-            value={account.gender ? account.gender : gender}
-          >
-            <MenuItem value={"Male"}>Male</MenuItem>
-            <MenuItem value={"Female"}>Female</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl className={`create-tournament ${classes.slider}`}>
-          <Typography id="discrete-slider" gutterBottom color="textPrimary">
-            Skill Level
-          </Typography>
-          <Slider
-            className={classes.bar}
-            value={account.skill ? account.skill : skill}
-            aria-labelledby="discrete-slider-restrict"
-            step={0.5}
-            marks
-            min={0}
-            max={6}
-            valueLabelDisplay="on"
-            onChange={(event, value) =>
-              dispatch(updateAccount({ skill: value }))
-            }
-            required
-          />
-        </FormControl>
+          onChange={(e) => dispatch(updateAccount({ name: e.target.value }))}
+          margin="normal"
+          required
+          defaultValue={name}
+        ></TextField>
+      </FormControl>
 
-        <div className="create-buttons">
-          <Button
-            className={classes.button}
-            onClick={() => {
-              createAccount(
-                name,
-                email,
-                phone,
-                zipcode,
-                birthdate,
-                skill,
-                gender
-              );
-            }}
-            variant="contained"
-            color="primary"
-          >
-            {setUp ? "Update Account" : "Create Account"}
-          </Button>
-          <Button
-            onClick={() => {
-              updateSetUpToggle(false);
-            }}
-            variant="contained"
-            color="primary"
-          >
-            Cancel
-          </Button>
-        </div>
+      <FormControl className="create-tournament">
+        <MuiPhoneNumber
+          variant="outlined"
+          defaultCountry={"us"}
+          onChange={(value) => dispatch(updateAccount({ phone: value }))}
+          label="Phone Number"
+          value={phone}
+          margin="normal"
+        />
+      </FormControl>
+      <FormControl className="create-tournament">
+        <TextField
+          label="Zipcode"
+          variant="outlined"
+          onChange={(e) => dispatch(updateAccount({ zipcode: e.target.value }))}
+          margin="normal"
+          defaultValue={zipcode}
+        ></TextField>
+      </FormControl>
+      <FormControl className="create-tournament">
+        <TextField
+          id="date"
+          label="Birthdate"
+          type="date"
+          variant="outlined"
+          margin="normal"
+          defaultValue={birthdate}
+          onChange={(e) =>
+            dispatch(updateAccount({ birthdate: e.target.value }))
+          }
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </FormControl>
+      <FormControl
+        variant="outlined"
+        className={`create-tournament ${classes.formControl}`}
+      >
+        <InputLabel id="demo-simple-select-outlined-label">Gender</InputLabel>
+        <Select
+          className={`create-tournament ${classes.selectEmpty} ${classes.dropdown}`}
+          labelId="demo-simple-select-outlined-label"
+          id="demo-simple-select-outlined"
+          onChange={(e) => dispatch(updateAccount({ gender: e.target.value }))}
+          label="Gender"
+          variant="outlined"
+          value={gender}
+        >
+          <MenuItem value={"Male"}>Male</MenuItem>
+          <MenuItem value={"Female"}>Female</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl className={`create-tournament ${classes.slider}`}>
+        <Typography id="discrete-slider" gutterBottom color="textPrimary">
+          Skill Level
+        </Typography>
+        <Slider
+          className={classes.bar}
+          value={skill}
+          aria-labelledby="discrete-slider-restrict"
+          step={0.5}
+          min={0}
+          max={6}
+          marks
+          valueLabelDisplay="on"
+          onChange={(event, value) => dispatch(updateAccount({ skill: value }))}
+        />
+      </FormControl>
+
+      <div className="create-buttons">
+        <Button
+          className={classes.button}
+          onClick={() => {
+            editAccount(name, phone, zipcode, birthdate, skill, gender);
+          }}
+          variant="contained"
+          color="primary"
+        >
+          Update Account
+        </Button>
+        <Button
+          onClick={() => {
+            updateSetUpToggle(false);
+          }}
+          variant="contained"
+          color="primary"
+        >
+          Cancel
+        </Button>
       </div>
-    </React.Fragment>
+    </div>
   );
 };
 

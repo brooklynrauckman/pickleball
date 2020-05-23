@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import * as firebase from "firebase/app";
 import "firebase/firestore";
@@ -24,17 +24,20 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// PROVIDER
-const provider = new firebase.auth.GoogleAuthProvider();
-
 const App = () => {
+  const [setUpToggle, updateSetUpToggle] = useState(false);
+
   return (
     <Provider store={store}>
       <Router>
         <div className="App">
           <Switch>
             <Route exact path="/">
-              <Login db={db} provider={provider} />
+              <Login
+                db={db}
+                updateSetUpToggle={updateSetUpToggle}
+                setUpToggle={setUpToggle}
+              />
             </Route>
           </Switch>
         </div>

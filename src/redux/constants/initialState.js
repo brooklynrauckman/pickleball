@@ -27,12 +27,12 @@ export const initialState = {
   tournaments: [],
   account: {
     name: "",
-    email: "",
     phone: "+1",
     zipcode: "",
-    birthdate: "1990-01-15",
+    birthdate: "2020-05-20",
     skill: 0,
     gender: "",
+    userEmail: "",
   },
   ids: [],
 };
