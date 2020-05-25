@@ -60,7 +60,10 @@ const Tourneys = (props) => {
   ];
 
   const convertDate = (t) => {
-    let dateTimestamp = new Date(t.date);
+    let month = t.date.substring(5, 7);
+    let day = t.date.substring(8, 10);
+    let year = t.date.substring(0, 4);
+    let dateTimestamp = new Date(`${month}/${day}/${year}`);
     let dateDay = dateTimestamp.getDay();
     let dateMonth = dateTimestamp.getMonth();
     let dateDate = dateTimestamp.getDate();
@@ -70,7 +73,10 @@ const Tourneys = (props) => {
     return ` ${dateDayOfWeek}, ${dateMonthOfYear} ${dateDate}, ${dateYear}`;
   };
   const convertDeadline = (t) => {
-    let dateTimestamp = new Date(t.deadline);
+    let month = t.deadline.substring(5, 7);
+    let day = t.deadline.substring(8, 10);
+    let year = t.deadline.substring(0, 4);
+    let dateTimestamp = new Date(`${month}/${day}/${year}`);
     let dateDay = dateTimestamp.getDay();
     let dateMonth = dateTimestamp.getMonth();
     let dateDate = dateTimestamp.getDate();
@@ -80,7 +86,10 @@ const Tourneys = (props) => {
     return ` ${dateDayOfWeek}, ${dateMonthOfYear} ${dateDate}, ${dateYear}`;
   };
   const convertOpen = (t) => {
-    let dateTimestamp = new Date(t.open);
+    let month = t.open.substring(5, 7);
+    let day = t.open.substring(8, 10);
+    let year = t.open.substring(0, 4);
+    let dateTimestamp = new Date(`${month}/${day}/${year}`);
     let dateDay = dateTimestamp.getDay();
     let dateMonth = dateTimestamp.getMonth();
     let dateDate = dateTimestamp.getDate();
@@ -95,7 +104,7 @@ const Tourneys = (props) => {
     let timeMinutes = parseInt(t.time.substring(3, 5));
     let convertMinutes = timeMinutes < 10 ? `0${timeMinutes}` : timeMinutes;
     if (timeHours > 12) return `${timeHours - 12}:${convertMinutes} PM`;
-    if ((timeHours = 12)) return `${timeHours}:${convertMinutes} PM`;
+    if (timeHours === 12) return `${timeHours}:${convertMinutes} PM`;
     if (timeHours < 12) return `${timeHours}:${convertMinutes} AM`;
   };
 
@@ -373,7 +382,7 @@ const Tourneys = (props) => {
                   <div className="details-title">{t.title}</div>
                   <div className="tournament-details">
                     <div className="detail">
-                      <strong>Date & Time:</strong>
+                      <strong>Tournament Date & Time:</strong>
                       {`${convertDate(t)} ${convertTime(t)}`}
                     </div>
                     <div className="detail">
@@ -394,18 +403,20 @@ const Tourneys = (props) => {
                         <strong>Minimum Age:</strong> {t.minAge} years
                       </div>
                     ) : null}
+
                     <div className="detail">
                       <strong>Skill Levels: </strong>
                       {t.skill && t.skill.toString() !== "0,6"
                         ? `${t.skill[0]}-${t.skill[1]}`
                         : "All"}
                     </div>
+
                     <div className="detail">
                       <strong>Round-Robin Type:</strong> {t.type}
                     </div>
                     {t.fee ? (
                       <div className="detail">
-                        <strong>Registration Fee:</strong> ${t.fee}
+                        <strong>Entry Fee:</strong> ${t.fee}
                       </div>
                     ) : null}
                     <div className="detail">
@@ -443,14 +454,23 @@ const Tourneys = (props) => {
                   <div className="option-buttons">
                     {user.uid === "DsoWpqEyMrcx6m8ViOy32uRuWjC2" ? (
                       <React.Fragment>
-                        <button
-                          className="option edit-button"
-                          onClick={() => {
-                            setEditable(t.id);
-                          }}
-                        >
-                          EDIT
-                        </button>
+                        {t.open.substring(0, 4) < currentDate.getFullYear() ||
+                        (t.open.substring(5, 7) < currentDate.getMonth() + 1 &&
+                          t.open.substring(0, 4) ==
+                            currentDate.getFullYear()) ||
+                        (t.open.substring(5, 7) == currentDate.getMonth() + 1 &&
+                          t.open.substring(8, 10) < currentDate.getDate() + 1 &&
+                          t.open.substring(0, 4) ==
+                            currentDate.getFullYear()) ? null : (
+                          <button
+                            className="option edit-button"
+                            onClick={() => {
+                              setEditable(t.id);
+                            }}
+                          >
+                            EDIT
+                          </button>
+                        )}
                         <button
                           className="option"
                           onClick={() => {

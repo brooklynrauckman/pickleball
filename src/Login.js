@@ -104,7 +104,6 @@ const Login = (props) => {
                 setEmail(e.target.value);
               }}
               margin="normal"
-              required
               defaultValue={email}
             ></TextField>
             <TextField
@@ -114,7 +113,6 @@ const Login = (props) => {
               type="password"
               onChange={(e) => setPassword(e.target.value)}
               margin="normal"
-              required
               defaultValue={password}
             ></TextField>
             <div className="login-buttons">

@@ -11,8 +11,9 @@ const Sidebar = () => {
 
   const [all] = useCollection(firebase.firestore().collection("tournaments"));
 
-  const { tournaments } = useSelector((state) => ({
+  const { tournaments, account } = useSelector((state) => ({
     tournaments: state.pickleball.tournaments,
+    account: state.pickleball.account,
   }));
   const [openFilters, setOpenFilters] = useState([]);
   const [selectedDateFilter, setSelectedDateFilter] = useState("");
@@ -23,6 +24,19 @@ const Sidebar = () => {
   const [selectedGenderFilter, setSelectedGenderFilter] = useState("");
   const [selectedFeeFilter, setSelectedFeeFilter] = useState("");
   const [search, updateSearch] = useState("");
+
+  let currentDate = new Date();
+
+  const convertBirthdate = (t) => {
+    let month = account.birthdate.substring(5, 7);
+    let day = account.birthdate.substring(8, 10);
+    let year = account.birthdate.substring(0, 4);
+    let dateTimestamp = new Date(`${month}/${day}/${year}`);
+    let dateMonth = dateTimestamp.getMonth();
+    let dateDay = dateTimestamp.getDate();
+    let dateYear = dateTimestamp.getFullYear();
+    return currentDate.getFullYear() - dateYear;
+  };
 
   useEffect(() => {
     const filterTourneys = async () => {
@@ -76,53 +90,28 @@ const Sidebar = () => {
           ((selectedTypeFilter === "modified" ? t.type === "Modified" : null) ||
             (selectedTypeFilter === "full" ? t.type === "Full" : null) ||
             (selectedTypeFilter === "" ? t : null)) &&
-          ((selectedSkillFilter === "0-3" ? t.skill[1] <= 3 : null) ||
-            (selectedSkillFilter === "2-5"
-              ? t.skill[0] >= 2 && t.skill[1] <= 5
-              : null) ||
-            (selectedSkillFilter === "3-6"
-              ? t.skill[0] >= 3 && t.skill[1] <= 6
-              : null) ||
-            (selectedSkillFilter === "All"
-              ? t.skill[0] === 0 && t.skill[1] === 6
-              : null) ||
+          ((selectedSkillFilter === "mySkill"
+            ? t.skill[0] <= account.skill
+            : null) ||
             (selectedSkillFilter === "" ? t : null)) &&
-          ((selectedAgeFilter === "0-10" ? t.minAge <= 10 : null) ||
-            (selectedAgeFilter === "11-20"
-              ? t.minAge >= 11 && t.minAge <= 20
-              : null) ||
-            (selectedAgeFilter === "21-30"
-              ? t.minAge >= 21 && t.minAge <= 30
-              : null) ||
-            (selectedAgeFilter === "31-40"
-              ? t.minAge >= 31 && t.minAge <= 40
-              : null) ||
-            (selectedAgeFilter === "41-50"
-              ? t.minAge >= 41 && t.minAge <= 50
-              : null) ||
-            (selectedAgeFilter === "51-60"
-              ? t.minAge >= 51 && t.minAge <= 60
-              : null) ||
-            (selectedAgeFilter === "61+" ? t.minAge >= 61 : null) ||
+          ((selectedAgeFilter === "myAge"
+            ? t.minAge <= convertBirthdate()
+            : null) ||
             (selectedAgeFilter === "" ? t : null)) &&
           ((selectedGenderFilter === "mens" ? t.gender === "Mens" : null) ||
             (selectedGenderFilter === "womens"
               ? t.gender === "Womens"
               : null) ||
-            (selectedGenderFilter === "mixed" ? t.gender === "Mixed" : null) ||
-            (selectedGenderFilter === "" ? t : null)) &&
-          ((selectedFeeFilter === "free" ? t.fee === 0 : null) ||
-            (selectedFeeFilter === "0-10" ? t.fee <= 10 : null) ||
-            (selectedFeeFilter === "10-20"
-              ? t.fee >= 10 && t.fee <= 20
+            (((selectedGenderFilter === "mixed"
+              ? t.gender === "Mixed"
               : null) ||
-            (selectedFeeFilter === "20-50"
-              ? t.fee >= 20 && t.fee <= 50
-              : null) ||
-            (selectedFeeFilter === "50+" ? t.fee >= 50 : null) ||
+              (selectedGenderFilter === "" ? t : null)) &&
+              (selectedFeeFilter === "free" ? t.fee === 0 : null)) ||
+            (selectedFeeFilter === "entryFee" ? t.fee !== 0 : null) ||
             (selectedFeeFilter === "" ? t : null))
       );
       dispatch(updateTournaments(returnValue));
+      console.log(account);
     };
     if (all) filterTourneys();
   }, [
@@ -178,7 +167,7 @@ const Sidebar = () => {
               >
                 -
               </div>
-              <div>Date</div>
+              <div>Tournament Date</div>
             </div>
             <div className="categories">
               {selectedDateFilter === "past" ? (
@@ -296,7 +285,7 @@ const Sidebar = () => {
             >
               +
             </div>
-            <div>Date</div>
+            <div>Tournament Date</div>
           </div>
         )}
         {!!openFilters.filter((f) => f === "location").length ? (
@@ -475,88 +464,25 @@ const Sidebar = () => {
               <div>Skill Level</div>
             </div>
             <div className="categories">
-              {selectedSkillFilter === "0-3" ? (
+              {selectedSkillFilter === "mySkill" ? (
                 <div
                   className="category"
                   onClick={() => setSelectedSkillFilter("")}
                 >
                   <img src="check.svg" alt="selected filter" />
-                  <div>0-3</div>
+                  <div>My Skill</div>
                 </div>
               ) : (
                 <div
                   className="category"
-                  onClick={() => setSelectedSkillFilter("0-3")}
+                  onClick={() => setSelectedSkillFilter("mySkill")}
                 >
                   <img
                     src="check.svg"
                     alt="selected filter"
                     className="hidden"
                   />
-                  <div>0-3</div>
-                </div>
-              )}
-              {selectedSkillFilter === "2-5" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedSkillFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>2-5</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedSkillFilter("2-5")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>2-5</div>
-                </div>
-              )}
-              {selectedSkillFilter === "3-6" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedSkillFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>3-6</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedSkillFilter("3-6")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>3-6</div>
-                </div>
-              )}
-              {selectedSkillFilter === "All" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedSkillFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>All</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedSkillFilter("All")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>All</div>
+                  <div>My Skill</div>
                 </div>
               )}
             </div>
@@ -584,155 +510,28 @@ const Sidebar = () => {
               >
                 -
               </div>
-              <div>Minimum Age</div>
+              <div>Age</div>
             </div>
             <div className="categories">
-              {selectedAgeFilter === "0-10" ? (
+              {selectedAgeFilter === "myAge" ? (
                 <div
                   className="category"
                   onClick={() => setSelectedAgeFilter("")}
                 >
                   <img src="check.svg" alt="selected filter" />
-                  <div>0-10</div>
+                  <div>My Age</div>
                 </div>
               ) : (
                 <div
                   className="category"
-                  onClick={() => setSelectedAgeFilter("0-10")}
+                  onClick={() => setSelectedAgeFilter("myAge")}
                 >
                   <img
                     src="check.svg"
                     alt="selected filter"
                     className="hidden"
                   />
-                  <div>0-10</div>
-                </div>
-              )}
-              {selectedAgeFilter === "11-20" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>11-20</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("11-20")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>11-20</div>
-                </div>
-              )}
-              {selectedAgeFilter === "21-30" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>21-30</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("21-30")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>21-30</div>
-                </div>
-              )}
-
-              {selectedAgeFilter === "31-40" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>31-40</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("31-40")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>31-40</div>
-                </div>
-              )}
-              {selectedAgeFilter === "41-50" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>41-50</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("41-50")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>41-50</div>
-                </div>
-              )}
-              {selectedAgeFilter === "51-60" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>51-60</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("51-60")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>51-60</div>
-                </div>
-              )}
-              {selectedAgeFilter === "61+" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>61+</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedAgeFilter("61+")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>61+</div>
+                  <div>My Age</div>
                 </div>
               )}
             </div>
@@ -745,7 +544,7 @@ const Sidebar = () => {
             >
               +
             </div>
-            <div>Minimum Age</div>
+            <div>Age</div>
           </div>
         )}
         {!!openFilters.filter((f) => f === "gender").length ? (
@@ -851,7 +650,7 @@ const Sidebar = () => {
               >
                 -
               </div>
-              <div>Fee</div>
+              <div>Cost</div>
             </div>
             <div className="categories">
               {selectedFeeFilter === "free" ? (
@@ -875,88 +674,25 @@ const Sidebar = () => {
                   <div>Free</div>
                 </div>
               )}
-              {selectedFeeFilter === "0-10" ? (
+              {selectedFeeFilter === "entryFee" ? (
                 <div
                   className="category"
                   onClick={() => setSelectedFeeFilter("")}
                 >
                   <img src="check.svg" alt="selected filter" />
-                  <div>$0-10</div>
+                  <div>Entry Fee</div>
                 </div>
               ) : (
                 <div
                   className="category"
-                  onClick={() => setSelectedFeeFilter("0-10")}
+                  onClick={() => setSelectedFeeFilter("entryFee")}
                 >
                   <img
                     src="check.svg"
                     alt="selected filter"
                     className="hidden"
                   />
-                  <div>$0-10</div>
-                </div>
-              )}
-              {selectedFeeFilter === "10-20" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedFeeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>$10-20</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedFeeFilter("10-20")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>$10-20</div>
-                </div>
-              )}
-              {selectedFeeFilter === "20-50" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedFeeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>$20-50</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedFeeFilter("20-50")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>$20-50</div>
-                </div>
-              )}
-              {selectedFeeFilter === "50+" ? (
-                <div
-                  className="category"
-                  onClick={() => setSelectedFeeFilter("")}
-                >
-                  <img src="check.svg" alt="selected filter" />
-                  <div>$50+</div>
-                </div>
-              ) : (
-                <div
-                  className="category"
-                  onClick={() => setSelectedFeeFilter("50+")}
-                >
-                  <img
-                    src="check.svg"
-                    alt="selected filter"
-                    className="hidden"
-                  />
-                  <div>$50+</div>
+                  <div>Entry Fee</div>
                 </div>
               )}
             </div>
@@ -969,7 +705,7 @@ const Sidebar = () => {
             >
               +
             </div>
-            <div>Fee</div>
+            <div>Cost</div>
           </div>
         )}
       </div>

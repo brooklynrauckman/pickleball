@@ -235,15 +235,24 @@ const CreateTourney = (props) => {
       for (let i in tournaments) {
         if (editable === tournaments[i].id) {
           if (title) tournaments[i].title = title;
-          if (date) tournaments[i].date = date;
-          if (time) tournaments[i].time = time;
+          if (date.substring(0, 4) > 2000) {
+            tournaments[i].date = date;
+          }
+          if (time !== "00:00") {
+            tournaments[i].time = time;
+            console.log("change", time);
+          } else {
+            console.log("no change", time);
+          }
           if (venue) tournaments[i].venue = venue;
           if (address) tournaments[i].address = address;
           if (city) tournaments[i].city = city;
           if (state) tournaments[i].state = state;
           if (zipcode) tournaments[i].zipcode = zipcode;
           if (inOrOut) tournaments[i].inOrOut = inOrOut;
-          if (courts) tournaments[i].courts = courts;
+          if (courts !== 0) {
+            tournaments[i].courts = courts;
+          }
           if (type && type === "Full") {
             tournaments[i].type = type;
             tournaments[i].maxPlayers = courts
@@ -272,10 +281,16 @@ const CreateTourney = (props) => {
           }
           if (gender) tournaments[i].gender = gender;
           if (minAge) tournaments[i].minAge = minAge;
-          if (skill) tournaments[i].skill = skill;
+          if (skill.toString() !== "0,0") {
+            tournaments[i].skill = skill;
+          }
           if (fee) tournaments[i].fee = fee;
-          if (open) tournaments[i].open = open;
-          if (deadline) tournaments[i].deadline = deadline;
+          if (open.substring(0, 4) > 2000) {
+            tournaments[i].open = open;
+          }
+          if (deadline.substring(0, 4) > 2000) {
+            tournaments[i].deadline = deadline;
+          }
           if (contact) tournaments[i].contact = contact;
           if (phone) tournaments[i].phone = phone;
           if (organizer) tournaments[i].organizer = organizer;
@@ -426,7 +441,10 @@ const CreateTourney = (props) => {
           variant="outlined"
           className={`create-tournament ${classes.formControl}`}
         >
-          <InputLabel id="demo-simple-select-outlined-label">
+          <InputLabel
+            id="demo-simple-select-outlined-label"
+            className={classes.dropdown}
+          >
             Indoor or Outdoor
           </InputLabel>
           <Select
@@ -438,7 +456,7 @@ const CreateTourney = (props) => {
             }
             label="Indoor or Outdoor"
             variant="outlined"
-            value={editableTourney ? editableTourney.inOrOut : inOrOut}
+            defaultValue={editableTourney ? editableTourney.inOrOut : inOrOut}
           >
             <MenuItem value={"Indoor"}>Indoor</MenuItem>
             <MenuItem value={"Outdoor"}>Outdoor</MenuItem>
@@ -448,7 +466,10 @@ const CreateTourney = (props) => {
           variant="outlined"
           className={`create-tournament ${classes.formControl}`}
         >
-          <InputLabel id="demo-simple-select-outlined-label">
+          <InputLabel
+            id="demo-simple-select-outlined-label"
+            className={classes.dropdown}
+          >
             Round-Robin Type
           </InputLabel>
           <Select
@@ -460,7 +481,7 @@ const CreateTourney = (props) => {
             }
             label="Round-Robin Type"
             variant="outlined"
-            value={editableTourney ? editableTourney.type : type}
+            defaultValue={editableTourney ? editableTourney.type : type}
           >
             <MenuItem value={"Modified"}>Modified</MenuItem>
             <MenuItem value={"Full"}>Full</MenuItem>
@@ -473,16 +494,16 @@ const CreateTourney = (props) => {
           </Typography>
           <Slider
             className={classes.bar}
-            value={editableTourney ? editableTourney.courts : courts}
+            defaultValue={editableTourney ? editableTourney.courts : courts}
             aria-labelledby="discrete-slider-restrict"
             step={1}
             marks
             min={type === "Full" ? 1 : 2}
             max={type === "Full" ? 4 : 8}
             valueLabelDisplay="on"
-            onChange={(event, value) =>
-              dispatch(updateTournament({ courts: value }))
-            }
+            onChange={(event, value) => {
+              dispatch(updateTournament({ courts: value }));
+            }}
             required
           />
         </FormControl>
@@ -490,7 +511,12 @@ const CreateTourney = (props) => {
           variant="outlined"
           className={`create-tournament ${classes.formControl}`}
         >
-          <InputLabel id="demo-simple-select-outlined-label">Gender</InputLabel>
+          <InputLabel
+            id="demo-simple-select-outlined-label"
+            className={classes.dropdown}
+          >
+            Gender
+          </InputLabel>
           <Select
             className={`create-tournament ${classes.selectEmpty} ${classes.dropdown}`}
             labelId="demo-simple-select-outlined-label"
@@ -501,7 +527,7 @@ const CreateTourney = (props) => {
             }
             label="Gender"
             variant="outlined"
-            value={editableTourney ? editableTourney.gender : gender}
+            defaultValue={editableTourney ? editableTourney.gender : gender}
           >
             <MenuItem value={"Mens"}>Mens</MenuItem>
             <MenuItem value={"Womens"}>Womens</MenuItem>
@@ -527,22 +553,25 @@ const CreateTourney = (props) => {
           </Typography>
           <Slider
             className={classes.bar}
-            value={editableTourney ? editableTourney.skill : skill}
+            defaultValue={editableTourney ? editableTourney.skill : skill}
             aria-labelledby="range-slider"
             step={0.5}
             marks
             min={0}
             max={6}
             valueLabelDisplay="on"
-            onChange={(event, value) =>
-              dispatch(updateTournament({ skill: value }))
-            }
+            onChange={(event, value) => {
+              dispatch(updateTournament({ skill: value }));
+            }}
             required
           />
         </FormControl>
 
         <FormControl fullWidth className={classes.margin} variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-amount">
+          <InputLabel
+            htmlFor="outlined-adornment-amount"
+            className={classes.dropdown}
+          >
             Registration Fee
           </InputLabel>
           <OutlinedInput
