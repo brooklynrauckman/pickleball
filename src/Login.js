@@ -22,7 +22,6 @@ const Login = (props) => {
   const awaitUser = async () => {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        console.log("signed in", user);
         createUser(user);
       } else {
         console.log("signed out");
@@ -35,7 +34,6 @@ const Login = (props) => {
       .where("userId", "==", user.uid)
       .get();
     if (querySnapshot.docs.length === 0) {
-      console.log("new doc", querySnapshot.docs);
       db.collection("users").add({
         userId: user.uid,
         tournaments: [],
@@ -49,6 +47,7 @@ const Login = (props) => {
           userEmail: user.email,
         },
       });
+      updateSetUpToggle(true);
     }
   };
 

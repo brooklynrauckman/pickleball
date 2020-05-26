@@ -269,7 +269,15 @@ const Tourneys = (props) => {
           };
         });
 
-        dispatch(updateTournaments(newFetchedTourneys));
+        const sortedTourneys = [...newFetchedTourneys].sort((a, b) => {
+          const key1 = new Date(a.date).getTime();
+          const key2 = new Date(b.date).getTime();
+          if (key2 < key1) return -1;
+          if (key2 > key1) return 1;
+          return 0;
+        });
+
+        dispatch(updateTournaments(sortedTourneys));
       }
     }
     async function getAccount() {
@@ -307,16 +315,29 @@ const Tourneys = (props) => {
   useEffect(() => {
     if (all) {
       const getMyTournies = async () => {
-        const fetchedTourneys = await all.docs[0].get("tournaments");
-        const myTourniesList = fetchedTourneys.filter((t) => {
+        const fetchedMyTourneys = await all.docs[0].get("tournaments");
+        const myTourniesList = fetchedMyTourneys.filter((t) => {
           if (t.participants.filter((p) => p === user.uid).length) return t;
         });
-        console.log(myTourniesList);
-        dispatch(updateTournaments(myTourniesList));
+        const sortedMyTourneys = [...myTourniesList].sort((a, b) => {
+          const key1 = new Date(a.date).getTime();
+          const key2 = new Date(b.date).getTime();
+          if (key2 < key1) return -1;
+          if (key2 > key1) return 1;
+          return 0;
+        });
+        dispatch(updateTournaments(sortedMyTourneys));
       };
       const getAllTournies = async () => {
         const fetchedTourneys = await all.docs[0].get("tournaments");
-        dispatch(updateTournaments(fetchedTourneys));
+        const sortedTourneys = [...fetchedTourneys].sort((a, b) => {
+          const key1 = new Date(a.date).getTime();
+          const key2 = new Date(b.date).getTime();
+          if (key2 < key1) return -1;
+          if (key2 > key1) return 1;
+          return 0;
+        });
+        dispatch(updateTournaments(sortedTourneys));
       };
       if (myTournies) getMyTournies();
       else {

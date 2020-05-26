@@ -23,6 +23,7 @@ const Sidebar = () => {
   const [selectedAgeFilter, setSelectedAgeFilter] = useState("");
   const [selectedGenderFilter, setSelectedGenderFilter] = useState("");
   const [selectedFeeFilter, setSelectedFeeFilter] = useState("");
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState("");
   const [search, updateSearch] = useState("");
 
   let currentDate = new Date();
@@ -102,16 +103,47 @@ const Sidebar = () => {
             (selectedGenderFilter === "womens"
               ? t.gender === "Womens"
               : null) ||
-            (((selectedGenderFilter === "mixed"
-              ? t.gender === "Mixed"
-              : null) ||
-              (selectedGenderFilter === "" ? t : null)) &&
-              (selectedFeeFilter === "free" ? t.fee === 0 : null)) ||
+            (selectedGenderFilter === "mixed" ? t.gender === "Mixed" : null) ||
+            (selectedGenderFilter === "" ? t : null)) &&
+          ((selectedFeeFilter === "free" ? t.fee === 0 : null) ||
             (selectedFeeFilter === "entryFee" ? t.fee !== 0 : null) ||
-            (selectedFeeFilter === "" ? t : null))
+            (selectedFeeFilter === "" ? t : null)) &&
+          ((selectedStatusFilter === "open"
+            ? t.deadline.substring(5, 7) >= currentDate.getMonth() + 1 &&
+              t.deadline.substring(8, 10) >= currentDate.getDate() + 1 &&
+              t.deadline.substring(0, 4) >= currentDate.getFullYear() &&
+              t.open.substring(5, 7) <= currentDate.getMonth() + 1 &&
+              t.open.substring(8, 10) <= currentDate.getDate() + 1 &&
+              t.open.substring(0, 4) <= currentDate.getFullYear()
+            : null) ||
+            (selectedStatusFilter === "closed"
+              ? t.deadline.substring(0, 4) < currentDate.getFullYear() ||
+                (t.deadline.substring(5, 7) < currentDate.getMonth() + 1 &&
+                  t.deadline.substring(0, 4) == currentDate.getFullYear()) ||
+                (t.deadline.substring(5, 7) == currentDate.getMonth() + 1 &&
+                  t.deadline.substring(8, 10) < currentDate.getDate() + 1 &&
+                  t.deadline.substring(0, 4) == currentDate.getFullYear()) ||
+                t.open.substring(0, 4) > currentDate.getFullYear() ||
+                (t.open.substring(5, 7) > currentDate.getMonth() + 1 &&
+                  t.open.substring(0, 4) == currentDate.getFullYear()) ||
+                (t.open.substring(5, 7) == currentDate.getMonth() + 1 &&
+                  t.open.substring(8, 10) > currentDate.getDate() + 1 &&
+                  t.open.substring(0, 4) == currentDate.getFullYear())
+              : null) ||
+            (selectedStatusFilter === "full"
+              ? t.participants >= t.maxPlayers
+              : null) ||
+            (selectedStatusFilter === "upcoming"
+              ? t.open.substring(0, 4) > currentDate.getFullYear() ||
+                (t.open.substring(5, 7) > currentDate.getMonth() + 1 &&
+                  t.open.substring(0, 4) == currentDate.getFullYear()) ||
+                (t.open.substring(8, 10) > currentDate.getDate() + 1 &&
+                  t.open.substring(5, 7) == currentDate.getMonth() + 1 &&
+                  t.open.substring(0, 4) == currentDate.getFullYear())
+              : null) ||
+            (selectedStatusFilter === "" ? t : null))
       );
       dispatch(updateTournaments(returnValue));
-      console.log(account);
     };
     if (all) filterTourneys();
   }, [
@@ -122,6 +154,7 @@ const Sidebar = () => {
     selectedAgeFilter,
     selectedGenderFilter,
     selectedFeeFilter,
+    selectedStatusFilter,
     all,
     search,
   ]);
@@ -706,6 +739,118 @@ const Sidebar = () => {
               +
             </div>
             <div>Cost</div>
+          </div>
+        )}
+        {!!openFilters.filter((f) => f === "status").length ? (
+          <React.Fragment>
+            <div className="filter">
+              <div
+                className="expand"
+                onClick={(e) => {
+                  setOpenFilters(openFilters.filter((f) => f !== "status"));
+                  setSelectedStatusFilter("");
+                }}
+              >
+                -
+              </div>
+              <div>Registration Status</div>
+            </div>
+            <div className="categories">
+              {selectedStatusFilter === "open" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedStatusFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Open</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedStatusFilter("open")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Open</div>
+                </div>
+              )}
+              {selectedStatusFilter === "closed" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedStatusFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Closed</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedStatusFilter("closed")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Closed</div>
+                </div>
+              )}
+              {selectedStatusFilter === "full" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedStatusFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Full</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedStatusFilter("full")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Full</div>
+                </div>
+              )}
+              {selectedStatusFilter === "upcoming" ? (
+                <div
+                  className="category"
+                  onClick={() => setSelectedStatusFilter("")}
+                >
+                  <img src="check.svg" alt="selected filter" />
+                  <div>Upcoming</div>
+                </div>
+              ) : (
+                <div
+                  className="category"
+                  onClick={() => setSelectedStatusFilter("upcoming")}
+                >
+                  <img
+                    src="check.svg"
+                    alt="selected filter"
+                    className="hidden"
+                  />
+                  <div>Upcoming</div>
+                </div>
+              )}
+            </div>
+          </React.Fragment>
+        ) : (
+          <div className="filter">
+            <div
+              className="expand"
+              onClick={(e) => setOpenFilters([...openFilters, "status"])}
+            >
+              +
+            </div>
+            <div>Registration Status</div>
           </div>
         )}
       </div>

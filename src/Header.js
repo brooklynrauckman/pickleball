@@ -16,7 +16,9 @@ const Header = (props) => {
 
   return (
     <div className="header">
-      <div className="greeting">Pickleball Tourneys</div>
+      <div className="greeting" onClick={() => window.location.reload(false)}>
+        Pickleball Tourneys
+      </div>
       <div className="header-buttons">
         {user.uid === "DsoWpqEyMrcx6m8ViOy32uRuWjC2" ? (
           <div>

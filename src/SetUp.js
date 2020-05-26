@@ -30,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
   },
   slider: {
-    marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
   },
   details: {
@@ -76,12 +75,15 @@ const SetUp = (props) => {
       if (birthdate) account.birthdate = birthdate;
       if (skill) account.skill = skill;
       if (gender) account.gender = gender;
-
-      querySnapshot.docs[0].ref.update({
-        account: account,
-      });
-      window.alert("Account update successful!");
-      updateSetUpToggle(false);
+      if (!name || !phone || !zipcode || !birthdate || !skill || !gender)
+        window.alert("Please, fill out all required fields.");
+      else {
+        querySnapshot.docs[0].ref.update({
+          account: account,
+        });
+        window.alert("Account update successful!");
+        updateSetUpToggle(false);
+      }
     } catch (error) {
       window.alert("Error updating account.");
       console.log("Error updating account", error);
@@ -97,7 +99,7 @@ const SetUp = (props) => {
           onChange={(e) => dispatch(updateAccount({ name: e.target.value }))}
           margin="normal"
           required
-          defaultValue={name}
+          value={name}
         ></TextField>
       </FormControl>
 
@@ -109,6 +111,7 @@ const SetUp = (props) => {
           label="Phone Number"
           value={phone}
           margin="normal"
+          required
         />
       </FormControl>
       <FormControl className="create-tournament">
@@ -117,7 +120,8 @@ const SetUp = (props) => {
           variant="outlined"
           onChange={(e) => dispatch(updateAccount({ zipcode: e.target.value }))}
           margin="normal"
-          defaultValue={zipcode}
+          value={zipcode}
+          required
         ></TextField>
       </FormControl>
       <FormControl className="create-tournament">
@@ -127,7 +131,8 @@ const SetUp = (props) => {
           type="date"
           variant="outlined"
           margin="normal"
-          defaultValue={birthdate}
+          value={birthdate}
+          required
           onChange={(e) =>
             dispatch(updateAccount({ birthdate: e.target.value }))
           }
@@ -140,7 +145,12 @@ const SetUp = (props) => {
         variant="outlined"
         className={`create-tournament ${classes.formControl}`}
       >
-        <InputLabel id="demo-simple-select-outlined-label">Gender</InputLabel>
+        <InputLabel
+          id="demo-simple-select-outlined-label"
+          className={classes.dropdown}
+        >
+          Gender
+        </InputLabel>
         <Select
           className={`create-tournament ${classes.selectEmpty} ${classes.dropdown}`}
           labelId="demo-simple-select-outlined-label"
@@ -166,6 +176,7 @@ const SetUp = (props) => {
           min={0}
           max={6}
           marks
+          required
           valueLabelDisplay="on"
           onChange={(event, value) => dispatch(updateAccount({ skill: value }))}
         />

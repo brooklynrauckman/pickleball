@@ -59,6 +59,10 @@
   text-align: center;
 }
 
+.greeting:hover {
+  cursor: pointer;
+}
+
 .header-buttons {
   margin: 0 1rem;
 }
