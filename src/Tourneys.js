@@ -14,11 +14,13 @@ import SetUp from "./SetUp.js";
 import Sidebar from "./Sidebar.js";
 import Header from "./Header.js";
 import Blur from "./Blur.js";
+import Dashboard from "./Dashboard.js";
 
 const Tourneys = (props) => {
   const { user, setUser, db, updateSetUpToggle, setUpToggle } = props;
   const [editable, setEditable] = useState(null);
   const [createToggle, updateCreateToggle] = useState(false);
+  const [dashboardToggle, updateDashboardToggle] = useState(false);
   const [register, setRegister] = useState(false);
   const [readyForDb, setReadyForDb] = useState(false);
   const [openTourney, setOpenTourney] = useState(null);
@@ -30,7 +32,6 @@ const Tourneys = (props) => {
     tournaments: state.pickleball.tournaments,
     tournament: state.pickleball.tournament,
     account: state.pickleball.account,
-    ids: state.pickleball.ids,
   }));
 
   let participants = tournament.participants;
@@ -195,8 +196,6 @@ const Tourneys = (props) => {
   useEffect(() => {
     async function addParticipants() {
       try {
-        const querySnapshot = await all.docs[0].get("tournaments");
-
         for (let i in tournaments) {
           if (tournament.id === tournaments[i].id) {
             tournaments[i].participants = tournament.participants;
@@ -206,6 +205,9 @@ const Tourneys = (props) => {
             });
           }
         }
+        value.docs[0].ref.update({
+          account: account,
+        });
         window.alert("Registration successful!");
         setRegister(false);
       } catch (error) {
@@ -213,7 +215,14 @@ const Tourneys = (props) => {
         console.log("Registration Error", error);
       }
     }
-    if (register && tournament.id && all && all.docs[0]) {
+    if (
+      register &&
+      tournament.id &&
+      all &&
+      all.docs[0] &&
+      value &&
+      value.docs[0]
+    ) {
       tournaments.map((tmt) => {
         if (
           tmt.id === tournament.id &&
@@ -232,7 +241,7 @@ const Tourneys = (props) => {
         }
       });
     }
-  }, [tournament.participants, all, register]);
+  }, [tournament.participants, all, value, register]);
 
   useEffect(() => {
     async function getTourneys() {
@@ -268,7 +277,6 @@ const Tourneys = (props) => {
             maxPlayers: t.maxPlayers,
           };
         });
-
         const sortedTourneys = [...newFetchedTourneys].sort((a, b) => {
           const key1 = new Date(a.date).getTime();
           const key2 = new Date(b.date).getTime();
@@ -276,7 +284,6 @@ const Tourneys = (props) => {
           if (key2 > key1) return 1;
           return 0;
         });
-
         dispatch(updateTournaments(sortedTourneys));
       }
     }
@@ -293,22 +300,14 @@ const Tourneys = (props) => {
             skill: fetchedAccount.skill,
             zipcode: fetchedAccount.zipcode,
             userEmail: fetchedAccount.userEmail,
+            tournaments: fetchedAccount.tournaments,
           })
         );
-      }
-    }
-    async function getIds() {
-      // we assume there is only 1 result so hardcode the [0]
-
-      const fetchedIds = await value.docs[0].get("id");
-      if (fetchedIds) {
-        dispatch(updateIds(fetchedIds));
       }
     }
     if (value && value.docs[0] && all && all.docs[0] && user) {
       getTourneys();
       getAccount();
-      getIds();
     }
   }, [value, all, user]);
 
@@ -376,8 +375,12 @@ const Tourneys = (props) => {
             <SetUp db={db} user={user} updateSetUpToggle={updateSetUpToggle} />
           </React.Fragment>
         ) : null}
+        {dashboardToggle ? <Dashboard openTourney={openTourney} /> : null}
         <div className="tournaments">
-          {tournaments.length && editable === null && createToggle === false
+          {tournaments.length &&
+          editable === null &&
+          createToggle === false &&
+          dashboardToggle === false
             ? tournaments.map((t, index) => (
                 <div
                   key={index}
@@ -482,7 +485,17 @@ const Tourneys = (props) => {
                         (t.open.substring(5, 7) == currentDate.getMonth() + 1 &&
                           t.open.substring(8, 10) < currentDate.getDate() + 1 &&
                           t.open.substring(0, 4) ==
-                            currentDate.getFullYear()) ? null : (
+                            currentDate.getFullYear()) ? (
+                          <button
+                            className="option edit-button"
+                            onClick={() => {
+                              setOpenTourney(t.id);
+                              updateDashboardToggle(true);
+                            }}
+                          >
+                            MANAGE
+                          </button>
+                        ) : (
                           <button
                             className="option edit-button"
                             onClick={() => {
@@ -492,6 +505,7 @@ const Tourneys = (props) => {
                             EDIT
                           </button>
                         )}
+
                         <button
                           className="option"
                           onClick={() => {
@@ -565,6 +579,18 @@ const Tourneys = (props) => {
                                           "Sorry, you do not qualify for this tournament based on your age."
                                         );
                                       else {
+                                        dispatch(
+                                          // copy the full account plus add a deep key of tournaments
+                                          updateAccount({
+                                            ...account,
+                                            ...{
+                                              tournaments: [
+                                                ...account.tournaments,
+                                                ...[t.id],
+                                              ],
+                                            },
+                                          })
+                                        );
                                         dispatch(
                                           // copy the full tourney plus add a deep key of participants
                                           updateTournament({

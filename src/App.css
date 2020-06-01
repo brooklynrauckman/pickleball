@@ -395,6 +395,36 @@
   cursor: pointer;
 }
 
+.round {
+  font-weight: bold;
+  margin: 1rem;
+  padding: 10px 8px;
+  width: auto;
+  background-color: inherit;
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  border: 1px solid black;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  transition: 0.3s ease-in-out;
+}
+.round:hover {
+  cursor: pointer;
+  border: 3px solid #32cd32;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 8px 8px;
+}
+.round:first-child {
+  margin-left: 0;
+}
+.dashboard-title {
+  font-size: 1.5rem;
+}
+
 @media (max-width: 900px) {
   .sidebar {
     position: relative;

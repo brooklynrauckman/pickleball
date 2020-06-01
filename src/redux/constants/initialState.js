@@ -33,6 +33,6 @@ export const initialState = {
     skill: 0,
     gender: "",
     userEmail: "",
+    tournaments: [],
   },
-  ids: [],
 };

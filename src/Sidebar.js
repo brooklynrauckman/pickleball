@@ -109,26 +109,26 @@ const Sidebar = () => {
             (selectedFeeFilter === "entryFee" ? t.fee !== 0 : null) ||
             (selectedFeeFilter === "" ? t : null)) &&
           ((selectedStatusFilter === "open"
-            ? t.deadline.substring(5, 7) >= currentDate.getMonth() + 1 &&
-              t.deadline.substring(8, 10) >= currentDate.getDate() + 1 &&
-              t.deadline.substring(0, 4) >= currentDate.getFullYear() &&
-              t.open.substring(5, 7) <= currentDate.getMonth() + 1 &&
-              t.open.substring(8, 10) <= currentDate.getDate() + 1 &&
-              t.open.substring(0, 4) <= currentDate.getFullYear()
+            ? (t.open.substring(0, 4) < currentDate.getFullYear() ||
+                (t.open.substring(5, 7) < currentDate.getMonth() + 1 &&
+                  t.open.substring(0, 4) == currentDate.getFullYear()) ||
+                (t.open.substring(8, 10) < currentDate.getDate() &&
+                  t.open.substring(5, 7) == currentDate.getMonth() + 1 &&
+                  t.open.substring(0, 4) == currentDate.getFullYear())) &&
+              (t.deadline.substring(0, 4) > currentDate.getFullYear() ||
+                (t.deadline.substring(5, 7) > currentDate.getMonth() + 1 &&
+                  t.deadline.substring(0, 4) == currentDate.getFullYear()) ||
+                (t.deadline.substring(8, 10) > currentDate.getDate() &&
+                  t.deadline.substring(5, 7) == currentDate.getMonth() + 1 &&
+                  t.deadline.substring(0, 4) == currentDate.getFullYear()))
             : null) ||
             (selectedStatusFilter === "closed"
               ? t.deadline.substring(0, 4) < currentDate.getFullYear() ||
                 (t.deadline.substring(5, 7) < currentDate.getMonth() + 1 &&
                   t.deadline.substring(0, 4) == currentDate.getFullYear()) ||
-                (t.deadline.substring(5, 7) == currentDate.getMonth() + 1 &&
-                  t.deadline.substring(8, 10) < currentDate.getDate() + 1 &&
-                  t.deadline.substring(0, 4) == currentDate.getFullYear()) ||
-                t.open.substring(0, 4) > currentDate.getFullYear() ||
-                (t.open.substring(5, 7) > currentDate.getMonth() + 1 &&
-                  t.open.substring(0, 4) == currentDate.getFullYear()) ||
-                (t.open.substring(5, 7) == currentDate.getMonth() + 1 &&
-                  t.open.substring(8, 10) > currentDate.getDate() + 1 &&
-                  t.open.substring(0, 4) == currentDate.getFullYear())
+                (t.deadline.substring(8, 10) < currentDate.getDate() &&
+                  t.deadline.substring(5, 7) == currentDate.getMonth() + 1 &&
+                  t.deadline.substring(0, 4) == currentDate.getFullYear())
               : null) ||
             (selectedStatusFilter === "full"
               ? t.participants >= t.maxPlayers
@@ -137,7 +137,7 @@ const Sidebar = () => {
               ? t.open.substring(0, 4) > currentDate.getFullYear() ||
                 (t.open.substring(5, 7) > currentDate.getMonth() + 1 &&
                   t.open.substring(0, 4) == currentDate.getFullYear()) ||
-                (t.open.substring(8, 10) > currentDate.getDate() + 1 &&
+                (t.open.substring(8, 10) > currentDate.getDate() &&
                   t.open.substring(5, 7) == currentDate.getMonth() + 1 &&
                   t.open.substring(0, 4) == currentDate.getFullYear())
               : null) ||

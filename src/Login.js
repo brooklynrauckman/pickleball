@@ -36,7 +36,6 @@ const Login = (props) => {
     if (querySnapshot.docs.length === 0) {
       db.collection("users").add({
         userId: user.uid,
-        tournaments: [],
         account: {
           name: "",
           phone: "+1",
@@ -45,6 +44,7 @@ const Login = (props) => {
           skill: 0,
           gender: "",
           userEmail: user.email,
+          tournaments: [],
         },
       });
       updateSetUpToggle(true);
