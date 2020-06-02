@@ -240,9 +240,6 @@ const CreateTourney = (props) => {
           }
           if (time !== "00:00") {
             tournaments[i].time = time;
-            console.log("change", time);
-          } else {
-            console.log("no change", time);
           }
           if (venue) tournaments[i].venue = venue;
           if (address) tournaments[i].address = address;

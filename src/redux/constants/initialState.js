@@ -13,7 +13,7 @@ export const initialState = {
     gender: "",
     minAge: 0,
     skill: [0, 0],
-    type: "Modified",
+    type: "",
     fee: 0,
     open: "2000-01-10",
     deadline: "2000-01-10",

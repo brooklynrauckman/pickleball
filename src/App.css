@@ -103,13 +103,6 @@
   border-right: none;
   transition: 0.3s ease-in-out;
 }
-.active {
-  border: 3px solid #32cd32;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  padding: 8px 8px;
-}
 
 .sign-in:hover {
   transform: scale(1.03);
@@ -397,17 +390,13 @@
 
 .round {
   font-weight: bold;
-  margin: 1rem;
-  padding: 10px 8px;
+  padding: 11px 8px;
   width: auto;
   background-color: inherit;
   font-family: inherit;
   font-size: 1rem;
   outline: none;
-  border: 1px solid black;
-  border-top: none;
-  border-left: none;
-  border-right: none;
+  border: none;
   transition: 0.3s ease-in-out;
 }
 .round:hover {
@@ -418,11 +407,60 @@
   border-right: none;
   padding: 8px 8px;
 }
-.round:first-child {
-  margin-left: 0;
-}
 .dashboard-title {
   font-size: 1.5rem;
+}
+
+.dashboard-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.court {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.court-number {
+  margin: 1rem 0;
+  font-weight: bold;
+}
+
+.court-half {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.round-score {
+  height: 2.25rem;
+  width: 2.25rem;
+  margin-left: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+  outline: none;
+}
+
+.net {
+  height: 4px;
+  width: 100%;
+  background-color: black;
+  margin: 2rem 0;
+}
+
+.active {
+  border: 3px solid #32cd32;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 8px 8px;
 }
 
 @media (max-width: 900px) {

@@ -78,7 +78,7 @@ const SetUp = (props) => {
       if (!name || !phone || !zipcode || !birthdate || !skill || !gender)
         window.alert("Please, fill out all required fields.");
       else {
-        querySnapshot.docs[0].ref.update({
+        querySnapshot.docs[0].ref.set({
           account: account,
         });
         window.alert("Account update successful!");
