@@ -50,219 +50,41 @@ const Dashboard = (props) => {
     for (let i = 0; i < tourneyPlayers.length; i++) {
       list.push(tourneyPlayers[i].name);
     }
-    if (activeRound === 2) {
-      let evens = [];
-      let odds = [];
-      for (let i = 0; i < list.length; i++) {
-        if (i % 2 === 0) evens.push(list[i]);
-        if (i % 2 !== 0) odds.push(list[i]);
-      }
-      list = evens.concat(odds);
-    }
-    if (activeRound === 3) {
-      let set = [];
-      for (let i = 0; i < list.length; i++) {
-        let first;
-        let inner;
-        let outer;
-        let last;
-        if (i % 4 === 0) {
-          first = list[i];
-          inner = list[i + 1];
-          outer = list[i + 2];
-          last = list[i + 3];
-          set.push(first, last, inner, outer);
-        }
-      }
-      list = set;
-    }
-    if (activeRound > 3) {
-      let set = [];
-      for (let i = 0; i < list.length; i++) {
-        let one = list[i];
-        let two = list[i + 1];
-        let three = list[i + 2];
-        let four = list[i + 3];
-        let five = list[i + 4];
-        let six = list[i + 5];
-        let seven = list[i + 6];
-        let eight = list[i + 7];
-        let nine = list[i + 8];
-        let ten = list[i + 9];
-        let eleven = list[i + 10];
-        let twelve = list[i + 11];
-        let thirteen = list[i + 12];
-        let fourteen = list[i + 13];
-        let fifteen = list[i + 14];
-        let sixteen = list[i + 15];
-        if (i % 8 === 0 && list.length % 8 === 0) {
-          if (activeRound === 4)
-            set.push(one, eight, two, seven, three, six, four, five);
-          if (activeRound === 5)
-            set.push(seven, one, two, eight, five, three, four, six);
-          if (activeRound === 6)
-            set.push(one, five, six, two, three, seven, eight, four);
-          if (activeRound === 7)
-            set.push(five, one, two, five, eight, three, four, seven);
-          if (activeRound === 8)
-            set.push(
-              one,
-              sixteen,
-              two,
-              fifteen,
-              three,
-              fourteen,
-              four,
-              thirteen,
-              five,
-              twelve,
-              six,
-              eleven,
-              seven,
-              ten,
-              eight,
-              nine
-            );
-          if (activeRound === 9)
-            set.push(
-              one,
-              fifteen,
-              two,
-              sixteen,
-              three,
-              thirteen,
-              four,
-              fourteen,
-              five,
-              eleven,
-              six,
-              twelve,
-              seven,
-              nine,
-              eight,
-              ten
-            );
-          if (activeRound === 10)
-            set.push(
-              one,
-              fourteen,
-              two,
-              thirteen,
-              three,
-              sixteen,
-              four,
-              fifteen,
-              five,
-              nine,
-              six,
-              ten,
-              seven,
-              eleven,
-              eight,
-              twelve
-            );
-          if (activeRound === 11)
-            set.push(
-              one,
-              thirteen,
-              two,
-              fourteen,
-              three,
-              fifteen,
-              four,
-              sixteen,
-              five,
-              ten,
-              six,
-              nine,
-              seven,
-              twelve,
-              eight,
-              eleven
-            );
-          if (activeRound === 12)
-            set.push(
-              one,
-              twelve,
-              two,
-              eleven,
-              three,
-              ten,
-              four,
-              nine,
-              five,
-              fifteen,
-              six,
-              sixteen,
-              seven,
-              thirteen,
-              eight,
-              fourteen
-            );
-          if (activeRound === 13)
-            set.push(
-              one,
-              eleven,
-              two,
-              twelve,
-              three,
-              nine,
-              four,
-              ten,
-              five,
-              sixteen,
-              six,
-              fifteen,
-              seven,
-              fourteen,
-              eight,
-              thirteen
-            );
-          if (activeRound === 14)
-            set.push(
-              one,
-              ten,
-              two,
-              nine,
-              three,
-              twelve,
-              four,
-              eleven,
-              five,
-              thirteen,
-              six,
-              fourteen,
-              seven,
-              fifteen,
-              eight,
-              sixteen
-            );
-          if (activeRound === 15)
-            set.push(
-              one,
-              nine,
-              two,
-              ten,
-              three,
-              eleven,
-              four,
-              twelve,
-              five,
-              fourteen,
-              six,
-              thirteen,
-              seven,
-              sixteen,
-              eight,
-              fifteen
-            );
-        }
-      }
-      list = set;
-    }
-
     return list;
   };
+
+  const playerPairs = () => {
+    let results = [];
+    for (let i = 0; i < playerNames().length - 1; i++) {
+      for (let j = i + 1; j < playerNames().length; j++) {
+        results.push([playerNames()[i], playerNames()[j]]);
+      }
+    }
+    return results;
+  };
+
+  // if (
+  //   pairs[i][0] !== pairs[j][0] &&
+  //   pairs[i][1] !== pairs[j][1] &&
+  //   pairs[i][1] !== pairs[j][0] &&
+  //   pairs[i][0] !== pairs[j][1]
+  // )
+
+  //Array is correct length but does not satisify the conditions above...
+  const playerSets = () => {
+    let results = [];
+    let pairs = playerPairs();
+    for (let i = 0; i < pairs.length; i + 2) {
+      for (let j = i + 1; j < pairs.length; j + 2) {
+        results.push([pairs[i], pairs[j]]);
+        i = i + 2;
+        j = j + 2;
+      }
+    }
+    return results;
+  };
+
+  if (players) console.log(playerSets());
 
   const courtsCalc = () => {
     let courts;
